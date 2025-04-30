@@ -9,6 +9,7 @@ body {
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
+    padding-right:45px;
     background-color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
@@ -73,6 +74,7 @@ body {
 
   .textCenter {
     text-align: center;
+    color: white;
   }
 /* Container Styling */
 .list-container {
@@ -172,6 +174,21 @@ body {
     background-color: #0056b3;
   }
   
+  .update-restaurant-bg {
+    background-image: url('https://images.pexels.com/photos/262047/pexels-photo-262047.jpeg?auto=compress&cs=tinysrgb&w=1600');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  
+
   .paddingBottom5 {
     padding-bottom: 5%;
   }
@@ -272,25 +289,51 @@ body {
     margin-top: 40px;
   }
   
+  .add-restaurant-bg {
+    background-image: url('https://images.pexels.com/photos/6267/menu-restaurant-vintage-table.jpg?auto=compress&cs=tinysrgb&w=1600');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+  }
+
+
+  .add-restaurant-overlay {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.6); /* dark overlay */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
   .add-restaurant-container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-width: 600px;                 /* ✅ full width like before */
+  width: 100%;
+  margin: 50px auto;                /* ✅ center the form */
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.1); /* ✅ transparent background */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* stronger for visibility */
+  color: white;
   }
   
   .add-restaurant-container h2 {
     text-align: center;
     margin-bottom: 25px;
-    color: #333;
+    color: white;
   }
   
   .restaurant-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    padding-right: 20px;
   }
   
   .restaurant-form input,
@@ -546,13 +589,33 @@ body {
     margin: 40px auto;
     padding: 20px;
     font-family: Arial, sans-serif; */
-    max-width: 1200px;
+    /* max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
     background-color: #f5f7fa;
-    border-radius: 12px;
+    border-radius: 12px; */
+    max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  color: white;
   }
   
+  .customer-bg {
+    background-image: url('https://images.pexels.com/photos/262918/pexels-photo-262918.jpeg?auto=compress&cs=tinysrgb&w=1600');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    width: 100%;
+    padding: 40px 20px;
+  }
+  
+
   .filters {
     display: flex;
     flex-wrap: wrap;
@@ -646,6 +709,29 @@ body {
     flex: 1 1 150px;
   }
   
+  .special-request-textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+  
+
+  .book-bg {
+    background-image: url('https://images.pexels.com/photos/262918/pexels-photo-262918.jpeg?auto=compress&cs=tinysrgb&w=1600');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  
+
   .booking-container {
     max-width: 700px;
     margin: 40px auto;
@@ -749,3 +835,143 @@ body {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   color: white;
 }
+.manager-dashboard-bg {
+  background-image: url('https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1600'); /* Replace with your desired image URL */
+  background-size: cover; /* Ensure the image covers the entire viewport */
+  background-position: center; /* Center the image */
+  background-attachment: fixed; /* Keep the background fixed when scrolling */
+  background-repeat: no-repeat; /* Prevent the image from repeating */
+  height: 100%; /* Full page height */
+  width: 100%; /* Full page width */
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.6); /* Dark overlay for better text visibility */
+}
+
+.dashboard-content {
+  position: relative;
+  z-index: 1; /* Ensure the content is above the background */
+  padding: 20px; /* Optional: Add padding around your content */
+}
+.review-modal {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  color: white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.special-request-textarea {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.customer-bookings {
+  background-image: url('https://images.pexels.com/photos/262918/pexels-photo-262918.jpeg?auto=compress&cs=tinysrgb&w=1600');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+
+  /* Overlay effect */
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.customer-bookings .result-card {
+  background: white;
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.customer-bookings .result-card:hover {
+  transform: translateY(-4px);
+}
+
+.customer-bookings .review-modal {
+  background: white;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 30px;
+  color: black;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.customer-bookings .special-request-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: rgba(255, 255, 255, 0.15);
+  resize: vertical;
+  margin: 10px 0 15px;
+}
+
+.customer-bookings button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.customer-bookings button:hover {
+  opacity: 0.9;
+}
+
+.customer-bookings .submit-review-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.customer-bookings .cancel-review-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.customer-bookings select {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+.customer-bookings-content {
+  max-width: 1000px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+.review-rating-select {
+  color: black;
+  background-color: white;
+  padding: 6px 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 8px;
+}
+

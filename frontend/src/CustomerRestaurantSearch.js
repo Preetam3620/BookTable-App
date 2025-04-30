@@ -182,7 +182,11 @@ const CustomerRestaurantSearch = () => {
       alert("Please select a date and time.");
       return;
     }
-
+    if (!filters.people || filters.people <= 0) {
+      alert("Please enter a valid number of people.");
+      return;
+    }
+    
     const now = new Date();
     const nearbyTimes = getNearbyTimes(filters.time);
     const nearbyDateTimes = nearbyTimes.map(
@@ -212,12 +216,13 @@ const CustomerRestaurantSearch = () => {
   };
 
   const handleBooking = (restaurant, time) => {
-    navigate(`/book/${restaurant.restaurant_id}?time=${time}`);
+    navigate(`/book/${restaurant.restaurant_id}?time=${time}&datetime=${filters.date}&people=${filters.people}`);
 
     // alert(`🎉 Booking confirmed at ${restaurant.name} for ${time}`);
   };
 
   return (
+    <div className="customer-bg">
     <div className="customer-search-container">
       <h2>Find a Restaurant</h2>
 
@@ -294,6 +299,7 @@ const CustomerRestaurantSearch = () => {
           ))
         )}
       </div>
+    </div>
     </div>
   );
 };

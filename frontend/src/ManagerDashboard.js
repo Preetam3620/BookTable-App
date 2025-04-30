@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RestaurantList from "./RestaurantList";
+import './styles.css';
 
 const dummyRestaurants = [
   {
@@ -209,29 +210,22 @@ const ManagerDashboard = () => {
   };
 
   return (
-    <div>
-      <h1 className="textCenter">Manager Dashboard</h1>
+    <div className="manager-dashboard-bg">
+      <div className="dashboard-content">
+        <h1 className="textCenter">Manager Dashboard</h1>
 
-      <div className="textCenter paddingBottom5">
-        <button
-          className="addNewRestaurantBtn"
-          onClick={() => navigate("/addRestaurantForm")}
-        >
-          Add New Restaurant
-        </button>
+        <div className="textCenter paddingBottom5">
+          <button
+            className="addNewRestaurantBtn"
+            onClick={() => navigate("/addRestaurantForm")}
+          >
+            Add New Restaurant
+          </button>
+        </div>
+        <div>
+          <RestaurantList restaurants={dummyRestaurants} />
+        </div>
       </div>
-      <div>
-        <RestaurantList restaurants={dummyRestaurants} />
-      </div>
-      {/* <ul>
-        {restaurants.map((r) => (
-          <li key={r.id}>
-            <strong>{r.name}</strong> – {r.address}
-            <button onClick={() => handleEdit(r.id)}>Edit</button>
-            <button onClick={() => handleDelete(r.id)}>Delete</button>
-          </li>
-        ))}
-      </ul> */}
     </div>
   );
 };

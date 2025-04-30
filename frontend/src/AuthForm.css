@@ -2,7 +2,6 @@
 
 /* Apply the background image only for pages where it's needed (e.g., login/register pages) */
 .auth-background {
-  background-image: url('images/hero-section-img.png'); /* Correct path to your image */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

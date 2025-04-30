@@ -1,4 +1,4 @@
-// File: pages/UpdateRestaurant.jsx
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -37,6 +37,7 @@ const UpdateRestaurant = () => {
   if (!restaurant) return <div>Loading...</div>;
 
   return (
+    <div className="update-restaurant-bg">
     <div className="form-container">
       <h2>Update Restaurant</h2>
       <form onSubmit={(e) => e.preventDefault()}>
@@ -80,6 +81,7 @@ const UpdateRestaurant = () => {
           Save
         </button>
       </form>
+    </div>
     </div>
   );
 };

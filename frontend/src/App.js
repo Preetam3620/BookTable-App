@@ -11,6 +11,7 @@ import Register from "./Register"; // Import the Register component
 import BookRestaurant from "./BookRestaurant";
 import CustomerRestaurantSearch from "./CustomerRestaurantSearch";
 import RestaurantList from "./RestaurantList";
+import CustomerBookings from "./CustomerBookings";
 
 
 import "./styles.css";
@@ -44,6 +45,8 @@ function App() {
         <Route path="/adminAnalytics" element={<AdminAnalytics />} />
         <Route path="/addRestaurantForm" element={<AddRestaurantForm />} />
         <Route path="/custDashboard" element={<CustomerRestaurantSearch />} />
+        <Route path="/my-bookings" element={<CustomerBookings />} />
+
       </Routes>
     </Router>
   );
