@@ -4,6 +4,7 @@ from app.auth.auth_middleware import AuthMiddleware
 from app.routes import (
     customerreviews,
     operatinghours,
+    photos,
     reservation,
     reservationslots,
     restaurant,
@@ -24,6 +25,7 @@ app.include_router(table.router, prefix="/api", tags=["Tables"])
 app.include_router(reservationslots.router, prefix="/api", tags=["Reservation Slots"])
 app.include_router(customerreviews.router, prefix="/api", tags=["Customer Reviews"])
 app.include_router(reservation.router, prefix="/api", tags=["Reservations"])
+app.include_router(photos.router, prefix="/api", tags=["Photos"])
 
 if __name__ == "__main__":
     import uvicorn

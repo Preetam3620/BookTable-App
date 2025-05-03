@@ -12,6 +12,7 @@ from app.models import (
     RestaurantModel,
     TableModel,
     UserModel,
+    PhotoModel,
 )
 
 print("Dropping old tables...")

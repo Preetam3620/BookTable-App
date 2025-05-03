@@ -6,6 +6,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 from app.schemas.CustomerReviewSchema import ReviewResponse
 from app.schemas.OperatingHoursSchema import OperatingHoursResponse
+from app.schemas.PhotoSchema import RestaurantPhotoResponse
 from app.schemas.TableSchema import TableResponse
 
 
@@ -67,7 +68,7 @@ class RestaurantResponse(RestaurantBase):
     approved_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
-    # photos: List[RestaurantPhotoResponse] = []
+    photos: List[RestaurantPhotoResponse] = []
     operating_hours: List[OperatingHoursResponse] = []
 
     class Config:
