@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from datetime import datetime
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app import database
@@ -230,3 +232,94 @@ async def delete_restaurant_admin(
     db.delete(restaurant)
     db.commit()
     return {"detail": "Restaurant deleted successfully"}
+
+
+@router.get(
+    "/admin/restaurants/pending",
+    response_model=List[RestaurantSchema.RestaurantResponse],
+)
+async def get_pending_restaurants(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    user = request.state.user
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to view pending approvals",
+        )
+
+    pending = (
+        db.query(RestaurantModel.Restaurant)
+          .filter(RestaurantModel.Restaurant.is_approved == False)
+          .all()
+    )
+    return pending
+
+
+@router.put(
+    "/admin/restaurants/{restaurant_id}/approve",
+    response_model=RestaurantSchema.RestaurantResponse,
+)
+async def approve_restaurant(
+    restaurant_id: int,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    user = request.state.user
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to approve restaurants",
+        )
+
+    restaurant = (
+        db.query(RestaurantModel.Restaurant)
+          .filter(RestaurantModel.Restaurant.restaurant_id == restaurant_id)
+          .first()
+    )
+    if not restaurant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Restaurant not found",
+        )
+
+    restaurant.is_approved = True
+    restaurant.approved_at = datetime.utcnow()
+    db.commit()
+    db.refresh(restaurant)
+    return restaurant
+
+
+@router.put(
+    "/admin/restaurants/{restaurant_id}/reject",
+    response_model=RestaurantSchema.RestaurantResponse,
+)
+async def reject_restaurant(
+    restaurant_id: int,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    user = request.state.user
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to reject restaurants",
+        )
+
+    restaurant = (
+        db.query(RestaurantModel.Restaurant)
+          .filter(RestaurantModel.Restaurant.restaurant_id == restaurant_id)
+          .first()
+    )
+    if not restaurant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Restaurant not found",
+        )
+
+    restaurant.is_approved = False
+    restaurant.approved_at = None
+    db.commit()
+    db.refresh(restaurant)
+    return restaurant
