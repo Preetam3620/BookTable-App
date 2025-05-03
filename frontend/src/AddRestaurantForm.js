@@ -110,6 +110,8 @@ const AddRestaurantForm = () => {
   };
   
   return (
+    <div className="add-restaurant-bg">
+      <div className="add-restaurant-overlay">
     <div className="add-restaurant-container">
       <h2>Add New Restaurant</h2>
       <form onSubmit={handleSubmit} className="restaurant-form" noValidate>
@@ -242,6 +244,8 @@ const AddRestaurantForm = () => {
           Add Restaurant
         </button>
       </form>
+    </div>
+    </div>
     </div>
   );
 };

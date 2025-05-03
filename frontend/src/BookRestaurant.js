@@ -1,5 +1,6 @@
-import React from "react";
+import React,{useState} from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+
 
 const dummyRestaurants = [
     {
@@ -134,12 +135,15 @@ const dummyRestaurants = [
     },
   ];
 
+  
 const BookRestaurant = () => {
+  const [specialRequest, setSpecialRequest] = useState("");
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
+  const people = searchParams.get("people");
   const time = searchParams.get("time");
+  const date = searchParams.get("date");
   const restaurant = dummyRestaurants.find(
     (r) => r.restaurant_id === parseInt(id)
   );
@@ -157,9 +161,12 @@ const BookRestaurant = () => {
   };
 
   return (
+    <div className="book-bg">
     <div className="booking-container">
       <h2>Booking at {restaurant.name}</h2>
       <p><strong>Time:</strong> {time}</p>
+      <p><strong>Time:</strong> {new Date(date).toLocaleString()}</p>
+      <p><strong>Party Size:</strong> {people}</p>
       <p><strong>Cuisine:</strong> {restaurant.cuisine_type}</p>
       <p><strong>Rating:</strong> ⭐ {restaurant.rating} ({restaurant.reviews} reviews)</p>
 
@@ -172,10 +179,19 @@ const BookRestaurant = () => {
         View on Google Maps
       </a>
 
-     
+      <h4>📝 Special Requests</h4>
+        <textarea
+          className="special-request-textarea"
+          value={specialRequest}
+          onChange={(e) => setSpecialRequest(e.target.value)}
+          placeholder="E.g. Table near the window, vegetarian meal..."
+          rows={4}
+        />
+
       <h4>🪑 Booking Actions</h4>
       <button onClick={handleBook}>Book Table</button>
       <button onClick={handleCancel}>Cancel Booking</button>
+    </div>
     </div>
   );
 };

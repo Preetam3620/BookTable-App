@@ -67,6 +67,66 @@ const AdminAnalytics = () => {
     setTopCities(top);
   }, []);
 
+// when will integrate with backend
+
+  // useEffect(() => {
+  //   const now = new Date();
+  //   const thirtyDaysAgo = new Date();
+  //   thirtyDaysAgo.setDate(now.getDate() - 30);
+
+  //   // Fetch data from backend API
+  //   axios.get("/api/restaurants")
+  //     .then((response) => {
+  //       // Assuming response.data is the array of restaurants
+  //       const allRestaurants = response.data;
+
+  //       // Filter recent restaurants
+  //       const recent = allRestaurants.filter(
+  //         (r) => new Date(r.created_at) >= thirtyDaysAgo
+  //       );
+  //       setRecentRestaurants(recent);
+
+  //       // Count by day
+  //       const countsByDay = recent.reduce((acc, r) => {
+  //         const dateKey = new Date(r.created_at).toLocaleDateString();
+  //         acc[dateKey] = (acc[dateKey] || 0) + 1;
+  //         return acc;
+  //       }, {});
+
+  //       const chartData = Object.entries(countsByDay).map(([date, count]) => ({
+  //         date,
+  //         count,
+  //       }));
+  //       setDailyCounts(chartData);
+
+  //       // Top cities
+  //       const cityCounts = recent.reduce((acc, r) => {
+  //         acc[r.city] = (acc[r.city] || 0) + 1;
+  //         return acc;
+  //       }, {});
+  //       const top = Object.entries(cityCounts)
+  //         .sort((a, b) => b[1] - a[1])
+  //         .slice(0, 3)
+  //         .map(([city, count]) => ({ city, count }));
+  //       setTopCities(top);
+
+  //       setLoading(false); // Data is loaded, stop loading state
+  //     })
+  //     .catch((err) => {
+  //       setError("Failed to load data");
+  //       setLoading(false); // If error, stop loading state
+  //     });
+  // }, []); // Runs only once on mount
+
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
+
+  // if (error) {
+  //   return <div>{error}</div>;
+  // }
+
+
   return (
     <div className="analytics-bg">
     <div className="admin-analytics">
