@@ -28,9 +28,7 @@ def _verify_manager_and_restaurant(
     # Find manager record
     manager = (
         db.query(RestaurantManagerModel.RestaurantManager)
-        .filter(
-            RestaurantManagerModel.RestaurantManager.user_id == user.get("user_id")
-        )
+        .filter(RestaurantManagerModel.RestaurantManager.user_id == user.get("user_id"))
         .first()
     )
     if not manager:

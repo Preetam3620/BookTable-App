@@ -128,7 +128,7 @@
 #     reservations = relationship("Reservation", back_populates="restaurant")
 #     reviews = relationship("Review", back_populates="restaurant")
 """
-'''# class RestaurantPhoto(Base):
+"""# class RestaurantPhoto(Base):
 #     __tablename__ = "restaurant_photos"
 
 #     photo_id = Column(Integer, primary_key=True, index=True)
@@ -139,7 +139,7 @@
 #     uploaded_at = Column(DateTime, default=datetime.utcnow)
 
 #     # Relationships
-#     restaurant = relationship("Restaurant", back_populates="photos")'''
+#     restaurant = relationship("Restaurant", back_populates="photos")"""
 """
 # class OperatingHours(Base):
 #     __tablename__ = "operating_hours"

@@ -1,11 +1,17 @@
-from datetime import datetime
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from datetime import datetime, date as dt_date, time as dt_time
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
+from sqlalchemy import Table, func, or_
 
 from app import database
-from app.models import RestaurantManagerModel, RestaurantModel
+from app.models import RestaurantManagerModel, RestaurantModel, TableModel
+from app.models import ReservationSlotModel
 from app.schemas import RestaurantSchema
+
+from app.models.RestaurantModel import Restaurant
+from app.models.TableModel import Table
+from app.models.ReservationSlotModel import ReservationSlot
 
 router = APIRouter()
 
@@ -251,8 +257,8 @@ async def get_pending_restaurants(
 
     pending = (
         db.query(RestaurantModel.Restaurant)
-          .filter(RestaurantModel.Restaurant.is_approved == False)
-          .all()
+        .filter(RestaurantModel.Restaurant.is_approved == False)
+        .all()
     )
     return pending
 
@@ -275,8 +281,8 @@ async def approve_restaurant(
 
     restaurant = (
         db.query(RestaurantModel.Restaurant)
-          .filter(RestaurantModel.Restaurant.restaurant_id == restaurant_id)
-          .first()
+        .filter(RestaurantModel.Restaurant.restaurant_id == restaurant_id)
+        .first()
     )
     if not restaurant:
         raise HTTPException(
@@ -309,8 +315,8 @@ async def reject_restaurant(
 
     restaurant = (
         db.query(RestaurantModel.Restaurant)
-          .filter(RestaurantModel.Restaurant.restaurant_id == restaurant_id)
-          .first()
+        .filter(RestaurantModel.Restaurant.restaurant_id == restaurant_id)
+        .first()
     )
     if not restaurant:
         raise HTTPException(
@@ -322,4 +328,116 @@ async def reject_restaurant(
     restaurant.approved_at = None
     db.commit()
     db.refresh(restaurant)
+    return restaurant
+
+
+# Customer Endpoints
+
+
+@router.get(
+    "/restaurants/search",
+    response_model=List[RestaurantSchema.RestaurantResponse],
+    summary="Search restaurants by date, time, party size & location",
+)
+def search_restaurants(
+    request: Request,
+    reservation_date: dt_date = Query(
+        ..., description="Required reservation date (YYYY-MM-DD)"
+    ),
+    reservation_time: Optional[dt_time] = Query(
+        None, description="Optional reservation time (HH:MM:SS)"
+    ),
+    party_size: Optional[int] = Query(
+        None, gt=0, description="Optional number of guests"
+    ),
+    location: Optional[str] = Query(
+        None, description="Optional location substring (e.g. city or neighborhood)"
+    ),
+    db: Session = Depends(database.get_db),
+):
+    # ensure this endpoint is hit by a customer
+    user = request.state.user
+    if user.get("role") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to search restaurants",
+        )
+
+    q = db.query(Restaurant)
+
+    # filter by location if provided
+    if location:
+        loc_filter = or_(
+            Restaurant.address_line1.ilike(f"%{location}%"),
+            Restaurant.address_line2.ilike(f"%{location}%"),
+            Restaurant.city.ilike(f"%{location}%"),
+            Restaurant.state.ilike(f"%{location}%"),
+            Restaurant.zip_code.ilike(f"%{location}%"),
+        )
+        q = q.filter(loc_filter)
+
+    # filter by table capacity if provided
+    if party_size:
+        q = q.join(Table, Restaurant.restaurant_id == Table.restaurant_id).filter(
+            Table.capacity >= party_size
+        )
+
+    # filter by slot date (always) and time (if provided)
+    q = q.join(
+        ReservationSlot, Restaurant.restaurant_id == ReservationSlot.restaurant_id
+    )
+    if reservation_time:
+        dt_full = datetime.combine(reservation_date, reservation_time)
+        q = q.filter(ReservationSlot.slot_time == dt_full)
+    else:
+        q = q.filter(func.date(ReservationSlot.slot_time) == reservation_date)
+
+    # ensure at least one table is available
+    q = q.filter(ReservationSlot.available_tables >= 1)
+
+    results = q.distinct().all()
+
+    if not results:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No restaurants found matching criteria",
+        )
+
+    return results
+
+
+@router.get(
+    "/restaurants/{restaurant_id}",
+    response_model=RestaurantSchema.RestaurantDetailResponse,
+    summary="Get detailed restaurant information",
+)
+def get_restaurant_detail(
+    restaurant_id: int,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    # ensure this endpoint is hit by a customer
+    user = request.state.user
+    if user.get("role") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to view restaurant details",
+        )
+
+    # fetch only approved restaurants
+    restaurant = (
+        db.query(Restaurant)
+        .filter(
+            Restaurant.restaurant_id == restaurant_id,
+            Restaurant.is_approved == True,
+        )
+        .first()
+    )
+
+    if not restaurant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Restaurant not found",
+        )
+
     return restaurant

@@ -73,11 +73,11 @@
 #     cuisine_type: CuisineType
 #     cost_rating: int = Field(..., ge=1, le=5)
 """
-'''# class RestaurantPhotoBase(BaseModel):
+"""# class RestaurantPhotoBase(BaseModel):
 #     url: str
 #     caption: Optional[str] = None
 #     display_order: int = 0
-'''
+"""
 """# class OperatingHoursBase(BaseModel):
 #     day_of_week: DayOfWeek
 #     opening_time: time
@@ -124,9 +124,9 @@
 """# class RestaurantCreate(RestaurantBase):
 #     pass
 """
-'''# class RestaurantPhotoCreate(RestaurantPhotoBase):
+"""# class RestaurantPhotoCreate(RestaurantPhotoBase):
 #     restaurant_id: int
-'''
+"""
 """# class OperatingHoursCreate(OperatingHoursBase):
 #     restaurant_id: int
 """
@@ -175,11 +175,11 @@
 #     is_approved: Optional[bool] = None
 #     approved_at: Optional[datetime] = None
 """
-'''# class RestaurantPhotoUpdate(BaseModel):
+"""# class RestaurantPhotoUpdate(BaseModel):
 #     url: Optional[str] = None
 #     caption: Optional[str] = None
 #     display_order: Optional[int] = None
-'''
+"""
 # class OperatingHoursUpdate(BaseModel):
 #     opening_time: Optional[time] = None
 #     closing_time: Optional[time] = None
@@ -256,14 +256,14 @@
 #     class Config:
 #         from_attributes = True
 """
-'''# class RestaurantPhotoResponse(RestaurantPhotoBase):
+"""# class RestaurantPhotoResponse(RestaurantPhotoBase):
 #     photo_id: int
 #     restaurant_id: int
 #     uploaded_at: datetime
 
 #     class Config:
 #         from_attributes = True
-'''
+"""
 """# class OperatingHoursResponse(OperatingHoursBase):
 #     hours_id: int
 #     restaurant_id: int

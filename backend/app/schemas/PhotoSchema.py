@@ -12,10 +12,12 @@ class RestaurantPhotoBase(BaseModel):
 class RestaurantPhotoCreate(RestaurantPhotoBase):
     pass
 
+
 class RestaurantPhotoUpdate(BaseModel):
     url: Optional[str] = None
     caption: Optional[str] = None
     display_order: Optional[int] = None
+
 
 class RestaurantPhotoResponse(RestaurantPhotoBase):
     photo_id: int
