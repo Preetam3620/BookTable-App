@@ -18,6 +18,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if request.url.path in ["/api/login", "/api/register"]:
             return await call_next(request)
 
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         credentials: HTTPAuthorizationCredentials = await self.security(request)
         if credentials:
             token = credentials.credentials

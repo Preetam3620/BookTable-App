@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.auth.auth_middleware import AuthMiddleware
 from app.routes import (
     customerreviews,
@@ -15,6 +15,14 @@ from app.routes import (
 app = FastAPI(
     title="FastAPI Backend",
     docs_url="/docs",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],     # ← your React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 app.add_middleware(AuthMiddleware)
 
