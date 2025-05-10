@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import RestaurantList from "./RestaurantList";
+import { getAllAdminRestaurants } from "./api/auth";
 
 const dummyRestaurants = [
   {
@@ -95,57 +97,65 @@ const dummyRestaurants = [
 ];
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [pendingRestaurants, setPendingRestaurants] = useState([]);
   const [approvedRestaurants, setApprovedRestaurants] = useState([]);
-
+  const fetchData = async () => {
+    try {
+      const res = await getAllAdminRestaurants();
+      console.log("Admin restaurants:", res);
+      setApprovedRestaurants(
+        res.filter((restaurant) => restaurant.is_approved)
+      ); // store in state if needed
+      setPendingRestaurants(
+        res.filter((restaurant) => !restaurant.is_approved)
+      );
+    } catch (err) {
+      console.error("Error fetching admin restaurants:", err);
+    }
+  };
   useEffect(() => {
-    fetch("/api/admin/pending-restaurants")
-      .then((res) => res.json())
-      .then((data) => setPendingRestaurants(data));
-
-    fetch("/api/admin/approved-restaurants")
-      .then((res) => res.json())
-      .then((data) => setApprovedRestaurants(data));
+    fetchData();
   }, []);
 
-  const approveRestaurant = (id) => {
-    fetch(`/api/admin/approve/${id}`, { method: "POST" }).then(() => {
-      setPendingRestaurants((prev) => prev.filter((r) => r.id !== id));
-      // optionally update approvedRestaurants
-    });
-  };
-
-  const deleteRestaurant = (id) => {
-    fetch(`/api/admin/delete/${id}`, { method: "DELETE" }).then(() => {
-      setApprovedRestaurants((prev) => prev.filter((r) => r.id !== id));
-      setPendingRestaurants((prev) => prev.filter((r) => r.id !== id));
-    });
+  const handleGoto = () => {
+    navigate("/adminAnalytics");
   };
 
   return (
-    <div class = "admin-dashboard-bg">
-      <div className="admin-dashboard-overlay">
-      <div className="admin-dashboard-content">
+    <>
+      <button
+        className="remove-button"
+        onClick={() => navigate("/adminAnalytics")}
+        style={{ marginLeft: "80%", borderRadius: "2px", width: "20%" }}
+      >
+        Admin Analytics
+      </button>
+      <div class="admin-dashboard-bg">
+        <div className="admin-dashboard-overlay">
+          <div className="admin-dashboard-content">
+            <h1 className="textCenter">Admin Dashboard</h1>
+            <div>
+              <RestaurantList
+                restaurants={pendingRestaurants}
+                isNavigationFromAdmin={true}
+                refreshData={fetchData}
+              />
+            </div>
 
-        <h1 className="textCenter">Admin Dashboard</h1>
-        <div>
-          <RestaurantList
-            restaurants={dummyRestaurants}
-            isNavigationFromAdmin={true}
-          />
+            <h2 className="textCenter">Existing Restaurants</h2>
+            <div>
+              <RestaurantList
+                restaurants={approvedRestaurants}
+                isNavigationFromAdmin={true}
+                isRemoveRestaurant={true}
+                refreshData={fetchData}
+              />
+            </div>
+          </div>
         </div>
-
-        <h2 className="textCenter">Existing Restaurants</h2>
-        <div>
-          <RestaurantList
-            restaurants={dummyRestaurants}
-            isNavigationFromAdmin={true}
-            isRemoveRestaurant={true}
-          />
-        </div>
-    </div>
-    </div>
-    </div>
+      </div>
+    </>
   );
 };
 

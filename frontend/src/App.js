@@ -6,13 +6,13 @@ import WelcomePage from "./WelcomePage";
 import AddRestaurantForm from "./AddRestaurantForm";
 import AdminAnalytics from "./AdminAnalytics";
 import AdminDashboard from "./AdminDashboard";
-import ManagerDashboard from "./ManagerDashboard";
-import Register from "./Register"; // Import the Register component
 import BookRestaurant from "./BookRestaurant";
-import CustomerRestaurantSearch from "./CustomerRestaurantSearch";
-import RestaurantList from "./RestaurantList";
 import CustomerBookings from "./CustomerBookings";
-
+import CustomerRestaurantSearch from "./CustomerRestaurantSearch";
+import ManagerDashboard from "./ManagerDashboard";
+import ProtectedRoute from "./ProtectedRoute";
+import Register from "./Register"; // Import the Register component
+import RestaurantList from "./RestaurantList";
 
 import "./styles.css";
 import UpdateRestaurant from "./UpdateRestaurant";
@@ -36,17 +36,79 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/managerDashboard" element={<ManagerDashboard />} />
-        <Route path="/adminDashboard" element={<AdminDashboard />} />
-        <Route path="/list" element={<RestaurantList />} />
-        <Route path="/book/:id" element={<BookRestaurant />} />
-
-        <Route path="/update/:id" element={<UpdateRestaurant />} />
-        <Route path="/adminAnalytics" element={<AdminAnalytics />} />
-        <Route path="/addRestaurantForm" element={<AddRestaurantForm />} />
-        <Route path="/custDashboard" element={<CustomerRestaurantSearch />} />
-        <Route path="/my-bookings" element={<CustomerBookings />} />
-
+        {/* Protected Routes */}
+        <Route
+          path="/managerDashboard"
+          element={
+            <ProtectedRoute>
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/adminDashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/list"
+          element={
+            <ProtectedRoute>
+              <RestaurantList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/book/:id"
+          element={
+            <ProtectedRoute>
+              <BookRestaurant />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/update/:id"
+          element={
+            <ProtectedRoute>
+              <UpdateRestaurant />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/adminAnalytics"
+          element={
+            <ProtectedRoute>
+              <AdminAnalytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addRestaurantForm"
+          element={
+            <ProtectedRoute>
+              <AddRestaurantForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/custDashboard"
+          element={
+            <ProtectedRoute>
+              <CustomerRestaurantSearch />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-bookings"
+          element={
+            <ProtectedRoute>
+              <CustomerBookings />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

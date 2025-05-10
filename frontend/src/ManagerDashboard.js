@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RestaurantList from "./RestaurantList";
-import './styles.css';
+import { getAllRestaurantsForManager } from "./api/auth";
+import "./styles.css";
 
 const dummyRestaurants = [
   {
@@ -190,11 +191,16 @@ const ManagerDashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
 
+  const fetchData = async () => {
+    try {
+      const res = await getAllRestaurantsForManager();
+      setRestaurants(res);
+    } catch (err) {
+      console.error("Error fetching admin restaurants:", err);
+    }
+  };
   useEffect(() => {
-    fetch("/api/manager/restaurants") // update with your actual backend route
-      .then((res) => res.json())
-      .then((data) => setRestaurants(data))
-      .catch((err) => console.error("Failed to fetch restaurants:", err));
+    fetchData();
   }, []);
 
   const handleEdit = (id) => {
@@ -202,7 +208,8 @@ const ManagerDashboard = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this listing?")) { // Shows a confirmation popup dialog to the user
+    if (window.confirm("Are you sure you want to delete this listing?")) {
+      // Shows a confirmation popup dialog to the user
       fetch(`/api/manager/restaurants/${id}`, { method: "DELETE" }).then(() => {
         setRestaurants((prev) => prev.filter((r) => r.id !== id));
       });
@@ -223,7 +230,7 @@ const ManagerDashboard = () => {
           </button>
         </div>
         <div>
-          <RestaurantList restaurants={dummyRestaurants} />
+          <RestaurantList restaurants={restaurants} />
         </div>
       </div>
     </div>

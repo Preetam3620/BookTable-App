@@ -1,5 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { managerAddRestaurant } from "./api/auth";
+
+const CostRatingEnum = Object.freeze({
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+});
+
+const daysOfWeek = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 const AddRestaurantForm = () => {
   const navigate = useNavigate();
@@ -7,13 +26,15 @@ const AddRestaurantForm = () => {
     name: "",
     description: "",
     cuisine_type: "italian",
-    addressLine1: "",
-    addressLine2: "",
+    address_line1: "",
+    address_line2: "",
     city: "",
     state: "",
-    zipcode: "",
+    zip_code: "",
     email: "",
     phone_number: "",
+    cost_rating: "",
+    operating_hours: [{ day_of_week: "", opening_time: "", closing_time: "" }],
   });
 
   const [errors, setErrors] = useState({});
@@ -21,25 +42,46 @@ const AddRestaurantForm = () => {
   const validate = () => {
     const newErrors = {};
 
+    // Basic fields
     if (!formData.name.trim()) newErrors.name = "Restaurant name is required.";
     if (!formData.description.trim())
       newErrors.description = "Description is required.";
-    if (!formData.addressLine1.trim())
-      newErrors.addressLine1 = "Address Line 1 is requried.";
-    if (!formData.zipcode.trim()) newErrors.zipcode = "Zipcode is required.";
+    if (!formData.address_line1.trim())
+      newErrors.address_line1 = "Address Line 1 is required.";
     if (!formData.city.trim()) newErrors.city = "City is required.";
     if (!formData.state.trim()) newErrors.state = "State is required.";
+    if (!formData.zip_code.trim()) newErrors.zip_code = "Zip code is required.";
     if (!formData.email.trim()) {
       newErrors.email = "Email is required.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Invalid email format.";
     }
-
     if (!formData.phone_number.trim()) {
       newErrors.phone_number = "Phone number is required.";
-    } else if (!/^\d{3}-\d{3}-\d{4}$/.test(formData.phone_number)) {
-      newErrors.phone_number =
-        "Phone number must be in the format 555-123-4567.";
+    } else if (!/^\d{10}$/.test(formData.phone_number.replace(/\D/g, ""))) {
+      newErrors.phone_number = "Phone number must be 10 digits.";
+    }
+    if (!formData.cost_rating) {
+      newErrors.cost_rating = "Cost rating is required.";
+    }
+
+    // Operating hours
+    if (
+      !Array.isArray(formData.operating_hours) ||
+      formData.operating_hours.length === 0
+    ) {
+      newErrors.operating_hours = "Add at least one operating-hours entry.";
+    } else {
+      formData.operating_hours.forEach((h, i) => {
+        if (!h.day_of_week)
+          newErrors[`operating_hours.${i}.day_of_week`] = "Select a day.";
+        if (!h.opening_time)
+          newErrors[`operating_hours.${i}.opening_time`] =
+            "Enter opening time.";
+        if (!h.closing_time)
+          newErrors[`operating_hours.${i}.closing_time`] =
+            "Enter closing time.";
+      });
     }
 
     setErrors(newErrors);
@@ -48,204 +90,291 @@ const AddRestaurantForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let newValue = value;
+    if (name === "cost_rating") {
+      newValue = CostRatingEnum[value] ?? "";
+    }
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleHoursChange = (idx, field, value) => {
+    setFormData((prev) => {
+      const hrs = [...prev.operating_hours];
+      hrs[idx] = { ...hrs[idx], [field]: value };
+      return { ...prev, operating_hours: hrs };
+    });
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[`operating_hours.${idx}.${field}`];
+      return copy;
+    });
+  };
+
+  const addOperatingHour = () => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      operating_hours: [
+        ...prev.operating_hours,
+        { day_of_week: "", opening_time: "", closing_time: "" },
+      ],
     }));
+  };
 
-    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear error on change
+  const removeOperatingHour = (idx) => {
+    setFormData((prev) => {
+      const hrs = prev.operating_hours.filter((_, i) => i !== idx);
+      return { ...prev, operating_hours: hrs };
+    });
+    setErrors((prev) => {
+      const copy = { ...prev };
+      Object.keys(copy).forEach((key) => {
+        if (key.startsWith(`operating_hours.${idx}.`)) delete copy[key];
+      });
+      return copy;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
     if (!validate()) return;
-  
-    const newRestaurant = {
-      ...formData,
-      created_at: new Date().toISOString(),
-      restaurant_id: Date.now(),
-    };
-  
+
     try {
-      const token = localStorage.getItem("token");
-  
-      const response = await fetch("/api/manager/restaurants", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newRestaurant),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to add restaurant");
-      }
-  
-      const data = await response.json();
-  
-      console.log("New restaurant added:", data);
+      await managerAddRestaurant(formData);
       alert("Restaurant submitted successfully!");
-  
-      setFormData({
-        name: "",
-        description: "",
-        cuisine_type: "italian",
-        addressLine1: "",
-        addressLine2: "",
-        city: "",
-        state: "",
-        zipcode: "",
-        email: "",
-        phone_number: "",
-      });
-  
-      setErrors({});
       navigate("/managerDashboard");
     } catch (err) {
       console.error("Error submitting form:", err);
       alert("Something went wrong while submitting the form.");
     }
   };
-  
+
   return (
     <div className="add-restaurant-bg">
       <div className="add-restaurant-overlay">
-    <div className="add-restaurant-container">
-      <h2>Add New Restaurant</h2>
-      <form onSubmit={handleSubmit} className="restaurant-form" noValidate>
-        <div className="form-group">
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            placeholder="Restaurant Name"
-            onChange={handleChange}
-          />
-          {errors.name && <span className="error-text">{errors.name}</span>}
-        </div>
+        <div className="add-restaurant-container">
+          <h2>Add New Restaurant</h2>
+          <form onSubmit={handleSubmit} className="restaurant-form" noValidate>
+            {/* Name */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="name"
+                placeholder="Restaurant Name"
+                value={formData.name}
+                onChange={handleChange}
+              />
+              {errors.name && <span className="error-text">{errors.name}</span>}
+            </div>
 
-        <div className="form-group">
-          <textarea
-            className="selectDescription"
-            name="description"
-            value={formData.description}
-            placeholder="Description"
-            onChange={handleChange}
-          />
-          {errors.description && (
-            <span className="error-text">{errors.description}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <select
-            name="cuisine_type"
-            value={formData.cuisine_type}
-            onChange={handleChange}
-            className="selectDescription"
-          >
-            <option value="italian">Italian</option>
-            <option value="chinese">Chinese</option>
-            <option value="indian">Indian</option>
-            <option value="japanese">Japanese</option>
-            <option value="mexican">Mexican</option>
-            <option value="french">French</option>
-            <option value="american">American</option>
-            <option value="thai">Thai</option>
-            <option value="mediterranean">Mediterranean</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+            {/* Description */}
+            <div className="form-group">
+              <textarea
+                name="description"
+                placeholder="Description"
+                value={formData.description}
+                onChange={handleChange}
+                className="selectDescription"
+              />
+              {errors.description && (
+                <span className="error-text">{errors.description}</span>
+              )}
+            </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="addressLine1"
-            value={formData.addressLine1}
-            placeholder="Address Line 1"
-            onChange={handleChange}
-          />
-          {errors.addressLine1 && (
-            <span className="error-text">{errors.addressLine1}</span>
-          )}
-        </div>
+            {/* Cuisine Type */}
+            <div className="form-group">
+              <select
+                name="cuisine_type"
+                value={formData.cuisine_type}
+                onChange={handleChange}
+                className="selectDescription"
+              >
+                <option value="italian">Italian</option>
+                <option value="chinese">Chinese</option>
+                <option value="indian">Indian</option>
+                <option value="japanese">Japanese</option>
+                <option value="mexican">Mexican</option>
+                <option value="french">French</option>
+                <option value="american">American</option>
+                <option value="thai">Thai</option>
+                <option value="mediterranean">Mediterranean</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="addressLine2"
-            value={formData.addressLine2}
-            placeholder="Address Line 2"
-            onChange={handleChange}
-          />
-        </div>
+            {/* Address Line 1 */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="address_line1"
+                placeholder="Address Line 1"
+                value={formData.address_line1}
+                onChange={handleChange}
+              />
+              {errors.address_line1 && (
+                <span className="error-text">{errors.address_line1}</span>
+              )}
+            </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            placeholder="City"
-            onChange={handleChange}
-          />
-          {errors.city && <span className="error-text">{errors.city}</span>}
-        </div>
+            {/* Address Line 2 */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="address_line2"
+                placeholder="Address Line 2"
+                value={formData.address_line2}
+                onChange={handleChange}
+              />
+            </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="state"
-            value={formData.state}
-            placeholder="State"
-            onChange={handleChange}
-          />
-          {errors.state && <span className="error-text">{errors.state}</span>}
-        </div>
+            {/* City */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="city"
+                placeholder="City"
+                value={formData.city}
+                onChange={handleChange}
+              />
+              {errors.city && <span className="error-text">{errors.city}</span>}
+            </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="zipcode"
-            value={formData.zipcode}
-            placeholder="Zipcode"
-            onChange={handleChange}
-          />
-          {errors.zipcode && (
-            <span className="error-text">{errors.zipcode}</span>
-          )}
-        </div>
+            {/* State */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="state"
+                placeholder="State"
+                value={formData.state}
+                onChange={handleChange}
+              />
+              {errors.state && (
+                <span className="error-text">{errors.state}</span>
+              )}
+            </div>
 
-        <div className="form-group">
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            placeholder="Email"
-            onChange={handleChange}
-          />
-          {errors.email && <span className="error-text">{errors.email}</span>}
-        </div>
+            {/* Zip Code */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="zip_code"
+                placeholder="Zip Code"
+                value={formData.zip_code}
+                onChange={handleChange}
+              />
+              {errors.zip_code && (
+                <span className="error-text">{errors.zip_code}</span>
+              )}
+            </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="phone_number"
-            value={formData.phone_number}
-            placeholder="Phone Number (e.g. 555-123-4567)"
-            onChange={handleChange}
-          />
-          {errors.phone_number && (
-            <span className="error-text">{errors.phone_number}</span>
-          )}
-        </div>
+            {/* Email */}
+            <div className="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {errors.email && (
+                <span className="error-text">{errors.email}</span>
+              )}
+            </div>
 
-        <button type="submit" className="submit-button">
-          Add Restaurant
-        </button>
-      </form>
-    </div>
-    </div>
+            {/* Phone Number */}
+            <div className="form-group">
+              <input
+                type="text"
+                name="phone_number"
+                placeholder="Phone Number (10 digits)"
+                value={formData.phone_number}
+                onChange={handleChange}
+              />
+              {errors.phone_number && (
+                <span className="error-text">{errors.phone_number}</span>
+              )}
+            </div>
+
+            {/* Cost Rating */}
+            <div className="form-group">
+              <select
+                name="cost_rating"
+                value={formData.cost_rating}
+                onChange={handleChange}
+                className="selectDescription"
+              >
+                <option value="">-- Cost Rating --</option>
+                <option value="1">$</option>
+                <option value="2">$$</option>
+                <option value="3">$$$</option>
+                <option value="4">$$$$</option>
+                <option value="5">$$$$$</option>
+              </select>
+              {errors.cost_rating && (
+                <span className="error-text">{errors.cost_rating}</span>
+              )}
+            </div>
+
+            {/* Operating Hours */}
+            <div className="form-group">
+              <label>Operating Hours</label>
+              {errors.operating_hours && (
+                <span className="error-text">{errors.operating_hours}</span>
+              )}
+              {formData.operating_hours.map((h, idx) => (
+                <div key={idx} className="hours-row">
+                  <select
+                    value={h.day_of_week}
+                    onChange={(e) =>
+                      handleHoursChange(idx, "day_of_week", e.target.value)
+                    }
+                  >
+                    <option value="">Day of Week</option>
+                    {daysOfWeek.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="time"
+                    value={h.opening_time}
+                    onChange={(e) =>
+                      handleHoursChange(idx, "opening_time", e.target.value)
+                    }
+                  />
+                  <input
+                    type="time"
+                    value={h.closing_time}
+                    onChange={(e) =>
+                      handleHoursChange(idx, "closing_time", e.target.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="remove-hour-btn"
+                    onClick={() => removeOperatingHour(idx)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="add-hour-btn"
+                onClick={addOperatingHour}
+              >
+                + Add Hours
+              </button>
+            </div>
+
+            {/* Submit */}
+            <button type="submit" className="submit-button">
+              Add Restaurant
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

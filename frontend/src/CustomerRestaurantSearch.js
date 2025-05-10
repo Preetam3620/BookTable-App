@@ -142,7 +142,7 @@ const CustomerRestaurantSearch = () => {
     location: "",
   });
 
-  const  navigate = useNavigate();
+  const navigate = useNavigate();
   const [restaurants] = useState(dummyRestaurants);
   const [results, setResults] = useState(dummyRestaurants); // show all by default
   const [hasSearched, setHasSearched] = useState(false); // track if search clicked
@@ -186,7 +186,7 @@ const CustomerRestaurantSearch = () => {
       alert("Please enter a valid number of people.");
       return;
     }
-    
+
     const now = new Date();
     const nearbyTimes = getNearbyTimes(filters.time);
     const nearbyDateTimes = nearbyTimes.map(
@@ -216,90 +216,92 @@ const CustomerRestaurantSearch = () => {
   };
 
   const handleBooking = (restaurant, time) => {
-    navigate(`/book/${restaurant.restaurant_id}?time=${time}&datetime=${filters.date}&people=${filters.people}`);
+    navigate(
+      `/book/${restaurant.restaurant_id}?time=${time}&datetime=${filters.date}&people=${filters.people}`
+    );
 
     // alert(`🎉 Booking confirmed at ${restaurant.name} for ${time}`);
   };
 
   return (
     <div className="customer-bg">
-    <div className="customer-search-container">
-      <h2>Find a Restaurant</h2>
+      <div className="customer-search-container">
+        <h2>Find a Restaurant</h2>
 
-      <div className="filters">
-        <input
-          type="date"
-          name="date"
-          value={filters.date}
-          onChange={handleChange}
-        />
-        <select
-          className="filtersSelect"
-          name="time"
-          value={filters.time}
-          onChange={handleChange}
-        >
-          <option value="">Select Time</option>
-          {generateTimeOptions().map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          name="people"
-          placeholder="# People"
-          value={filters.people}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="City / State / Zip (optional)"
-          value={filters.location}
-          onChange={handleChange}
-        />
-        <button onClick={handleSearch}>Search</button>
+        <div className="filters">
+          <input
+            type="date"
+            name="date"
+            value={filters.date}
+            onChange={handleChange}
+          />
+          <select
+            className="filtersSelect"
+            name="time"
+            value={filters.time}
+            onChange={handleChange}
+          >
+            <option value="">Select Time</option>
+            {generateTimeOptions().map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            name="people"
+            placeholder="# People"
+            value={filters.people}
+            onChange={handleChange}
+          />
+          <input
+            type="text"
+            name="location"
+            placeholder="City / State / Zip (optional)"
+            value={filters.location}
+            onChange={handleChange}
+          />
+          <button onClick={handleSearch}>Search</button>
+        </div>
+
+        <div className="results">
+          {results.length === 0 ? (
+            <p>No restaurants match your search.</p>
+          ) : (
+            results.map((r) => (
+              <div key={r.restaurant_id} className="result-card">
+                <h3>{r.name}</h3>
+                <p>
+                  Cuisine: <strong>{r.cuisine_type}</strong> | Cost:{" "}
+                  <strong>{r.cost_rating}</strong>
+                </p>
+                <p>
+                  ⭐ {r.rating} ({r.reviews} reviews) | Booked{" "}
+                  {r.times_booked_today} times today
+                </p>
+
+                {/* ✅ Only show slots if search was performed */}
+                {hasSearched && filters.time && (
+                  <div className="slots">
+                    {r.availability
+                      .filter((t) => getNearbyTimes(filters.time).includes(t))
+                      .map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => handleBooking(r, t)}
+                          className="slot-btn"
+                        >
+                          {t}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
-
-      <div className="results">
-        {results.length === 0 ? (
-          <p>No restaurants match your search.</p>
-        ) : (
-          results.map((r) => (
-            <div key={r.restaurant_id} className="result-card">
-              <h3>{r.name}</h3>
-              <p>
-                Cuisine: <strong>{r.cuisine_type}</strong> | Cost:{" "}
-                <strong>{r.cost_rating}</strong>
-              </p>
-              <p>
-                ⭐ {r.rating} ({r.reviews} reviews) | Booked{" "}
-                {r.times_booked_today} times today
-              </p>
-
-              {/* ✅ Only show slots if search was performed */}
-              {hasSearched && filters.time && (
-                <div className="slots">
-                  {r.availability
-                    .filter((t) => getNearbyTimes(filters.time).includes(t))
-                    .map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => handleBooking(r, t)}
-                        className="slot-btn"
-                      >
-                        {t}
-                      </button>
-                    ))}
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
     </div>
   );
 };

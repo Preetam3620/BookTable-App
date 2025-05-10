@@ -10,7 +10,7 @@ const RegisterPage = () => {
     phone_number: "",
     first_name: "",
     last_name: "",
-    role: "CUSTOMER",
+    role: "customer",
   });
 
   const [errors, setErrors] = useState({});
@@ -90,8 +90,10 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="inputCreateRestaurant"
             />
-            {errors.first_name && <p className="error-text">{errors.first_name}</p>}
-  
+            {errors.first_name && (
+              <p className="error-text">{errors.first_name}</p>
+            )}
+
             <input
               name="last_name"
               placeholder="Last Name"
@@ -99,8 +101,10 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="inputCreateRestaurant"
             />
-            {errors.last_name && <p className="error-text">{errors.last_name}</p>}
-  
+            {errors.last_name && (
+              <p className="error-text">{errors.last_name}</p>
+            )}
+
             <input
               name="phone_number"
               placeholder="Phone Number"
@@ -108,8 +112,10 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="inputCreateRestaurant"
             />
-            {errors.phone_number && <p className="error-text">{errors.phone_number}</p>}
-  
+            {errors.phone_number && (
+              <p className="error-text">{errors.phone_number}</p>
+            )}
+
             <input
               name="email"
               type="email"
@@ -119,7 +125,7 @@ const RegisterPage = () => {
               className="inputCreateRestaurant"
             />
             {errors.email && <p className="error-text">{errors.email}</p>}
-  
+
             <input
               name="password"
               type="password"
@@ -129,18 +135,18 @@ const RegisterPage = () => {
               className="inputCreateRestaurant"
             />
             {errors.password && <p className="error-text">{errors.password}</p>}
-  
+
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
               className="inputCreateRestaurant"
             >
-              <option value="CUSTOMER">Customer</option>
-              <option value="RESTAURANT_MANAGER">Restaurant Manager</option>
-              <option value="ADMIN">Admin</option>
+              <option value="customer">Customer</option>
+              <option value="restaurant_manager">Restaurant Manager</option>
+              <option value="admin">Admin</option>
             </select>
-  
+
             <button type="submit">Register</button>
             {generalError && <p className="error-text">{generalError}</p>}
           </form>
@@ -151,7 +157,6 @@ const RegisterPage = () => {
       </div>
     </div>
   );
-  
 };
 
 export default RegisterPage;

@@ -1,20 +1,28 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './styles.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { adminApproveRestaurant, adminRemoveRestaurant } from "./api/auth";
+import "./styles.css";
 
-const RestaurantList = ({ restaurants, isNavigationFromAdmin, isRemoveRestaurant }) => {
+const RestaurantList = ({
+  restaurants,
+  isNavigationFromAdmin,
+  isRemoveRestaurant,
+  refreshData,
+}) => {
   const navigate = useNavigate();
 
   const handleUpdateClick = (restaurantId) => {
     navigate(`/update/${restaurantId}`);
   };
 
-  const handleApproveClick = (restaurantId) => {
-    alert(`Approved restaurant ID: ${restaurantId}`);
+  const handleApproveClick = async (restaurantId) => {
+    await adminApproveRestaurant({ restaurantId });
+    if (refreshData) refreshData();
   };
 
-  const handleRemoveClick = (restaurantId) => {
-    alert(`Removed restaurant ID: ${restaurantId}`);
+  const handleRemoveClick = async (restaurantId) => {
+    await adminRemoveRestaurant({ restaurantId });
+    if (refreshData) refreshData();
   };
 
   return (
@@ -22,17 +30,21 @@ const RestaurantList = ({ restaurants, isNavigationFromAdmin, isRemoveRestaurant
       <h2 className="page-title">
         {isNavigationFromAdmin
           ? isRemoveRestaurant
-            ? '🗑️ Remove Restaurants'
-            : '🛠️ Approve Restaurants'
-          : '🍽️ Restaurant Directory'}
+            ? "🗑️ Remove Restaurants"
+            : "🛠️ Approve Restaurants"
+          : "🍽️ Restaurant Directory"}
       </h2>
       <div className="card-grid">
         {restaurants.map((restaurant) => (
           <div key={restaurant.restaurant_id} className="restaurant-card">
             <h3 className="restaurant-name">{restaurant.name}</h3>
             <p className="description">{restaurant.description}</p>
-            <p className="location">{restaurant.city}, {restaurant.state}</p>
-            <p className="contact">{restaurant.email} | {restaurant.phone_number}</p>
+            <p className="location">
+              {restaurant.city}, {restaurant.state}
+            </p>
+            <p className="contact">
+              {restaurant.email} | {restaurant.phone_number}
+            </p>
 
             {isNavigationFromAdmin ? (
               isRemoveRestaurant ? (
@@ -43,12 +55,28 @@ const RestaurantList = ({ restaurants, isNavigationFromAdmin, isRemoveRestaurant
                   ❌ Remove Restaurant
                 </button>
               ) : (
-                <button
-                  className="approve-button"
-                  onClick={() => handleApproveClick(restaurant.restaurant_id)}
-                >
-                  ✅ Approve
-                </button>
+                <>
+                  <div
+                    style={{ display: "flex", gap: "10px", marginTop: "10px" }}
+                  >
+                    <button
+                      className="approve-button"
+                      onClick={() =>
+                        handleApproveClick(restaurant.restaurant_id)
+                      }
+                    >
+                      ✅ Approve
+                    </button>
+                    <button
+                      className="reject-button"
+                      onClick={() =>
+                        handleRemoveClick(restaurant.restaurant_id)
+                      }
+                    >
+                      ❌ Reject
+                    </button>
+                  </div>
+                </>
               )
             ) : (
               <button

@@ -22,7 +22,8 @@ const LoginPage = () => {
     const newErrors = { username: "", password: "" };
     let valid = true;
 
-    if (!form.username.trim()) {    // !"" evaluates to true because "" is falsy.
+    if (!form.username.trim()) {
+      // !"" evaluates to true because "" is falsy.
       newErrors.username = "Email is required";
       valid = false;
     } else if (!/\S+@\S+\.\S+/.test(form.username)) {
@@ -47,7 +48,11 @@ const LoginPage = () => {
     if (!validateForm()) return;
     try {
       const res = await loginUser(new URLSearchParams(form)); //This sends a login request to the backend.
-      localStorage.setItem("token", res.data.access_token);
+      if (res.access_token) {
+        localStorage.setItem("accessToken", res.access_token);
+        localStorage.setItem("role", form.role);
+      }
+
       if (form.role === "CUSTOMER") {
         navigate("/custDashboard");
       } else if (form.role === "RESTAURANT_MANAGER") {
