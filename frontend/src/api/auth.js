@@ -1,8 +1,14 @@
 import API from "../api";
 
-const API = axios.create({
-  baseURL: "http://localhost:8000/api", // or your FastAPI backend URL
-});
+export const loginUser = async (formData) => {
+  try {
+    const response = await API.post("/login", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Login failed:", error);
+    throw error;
+  }
+};
 
 export const registerUser = async (data) => {
   try {
