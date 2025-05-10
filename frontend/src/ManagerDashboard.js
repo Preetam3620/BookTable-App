@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RestaurantList from "./RestaurantList";
 import './styles.css';
+import API from "./index";
 
 const dummyRestaurants = [
   {
@@ -189,12 +190,16 @@ const dummyRestaurants = [
 const ManagerDashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
-
+  const [error, setError] = useState(null);
   useEffect(() => {
-    fetch("/api/manager/restaurants") // update with your actual backend route
-      .then((res) => res.json())
-      .then((data) => setRestaurants(data))
-      .catch((err) => console.error("Failed to fetch restaurants:", err));
+    API.get("/manager/restaurants")
+      .then(({ data }) => {
+        setRestaurants(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch restaurants:", err);
+        setError("Unable to load restaurants.");
+      });
   }, []);
 
   const handleEdit = (id) => {
@@ -203,7 +208,7 @@ const ManagerDashboard = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this listing?")) { // Shows a confirmation popup dialog to the user
-      fetch(`/api/manager/restaurants/${id}`, { method: "DELETE" }).then(() => {
+      fetch(`/manager/restaurants/${id}`, { method: "DELETE" }).then(() => {
         setRestaurants((prev) => prev.filter((r) => r.id !== id));
       });
     }

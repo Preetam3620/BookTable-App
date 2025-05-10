@@ -50,7 +50,7 @@ const LoginPage = () => {
       localStorage.setItem("token", res.data.access_token);
       if (form.role === "CUSTOMER") {
         navigate("/custDashboard");
-      } else if (form.role === "RESTAURANT_MANAGER") {
+      } else if (form.role === "restaurant_manager") {
         navigate("/managerDashboard");
       } else if (form.role === "ADMIN") {
         navigate("/adminDashboard");
@@ -95,7 +95,7 @@ const LoginPage = () => {
               className="inputCreateRestaurant"
             >
               <option value="CUSTOMER">Customer</option>
-              <option value="RESTAURANT_MANAGER">Restaurant Manager</option>
+              <option value="restaurant_manager">Restaurant Manager</option>
               <option value="ADMIN">Admin</option>
             </select>
 

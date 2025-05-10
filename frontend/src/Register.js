@@ -68,7 +68,6 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     try {
       await registerUser(form);
       navigate("/login");
@@ -137,7 +136,7 @@ const RegisterPage = () => {
               className="inputCreateRestaurant"
             >
               <option value="CUSTOMER">Customer</option>
-              <option value="RESTAURANT_MANAGER">Restaurant Manager</option>
+              <option value="restaurant_manager">Restaurant Manager</option>
               <option value="ADMIN">Admin</option>
             </select>
   
