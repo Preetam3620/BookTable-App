@@ -816,7 +816,6 @@ body {
     position: relative;
   }
   
-  
 .admin-dashboard-overlay {
   position: relative;
   inset: 0; /* shortcut for top: 0; right: 0; bottom: 0; left: 0; */
@@ -847,6 +846,11 @@ body {
   width: 100%; /* Full page width */
   position: relative;
   background-color: rgba(0, 0, 0, 0.6); /* Dark overlay for better text visibility */
+
+    min-height: 100vh;
+    padding: 50px 20px;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .dashboard-content {

@@ -121,7 +121,7 @@ export const addReview = async (data) => {
   }
 };
 
-export const getAllCustomers = async () => {
+export const getAllRestaurantsForCustomers = async () => {
   try {
     const response = await API.get("/customer/restaurants");
     return response.data;
@@ -137,6 +137,17 @@ export const getAllReviewsForRestaurant = async (data) => {
     return response.data;
   } catch (error) {
     console.error("Review get restarurant failed:", error);
+    throw error;
+  }
+};
+
+export const bookReservation = async (data) => {
+  try {
+    const response = await API.post("/reservations", data);
+    return response.data;
+  } catch (error) {
+    alert(error.response.data.detail);
+    console.error("review failed:", error);
     throw error;
   }
 };

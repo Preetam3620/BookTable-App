@@ -25,7 +25,7 @@ const daysOfWeek = [
 
 const generateTimeOptions = () => {
   const times = [];
-  for (let hour = 8; hour <= 22; hour++) {
+  for (let hour = 0; hour < 24; hour++) {
     for (let min = 0; min < 60; min += 30) {
       const formatted = `${String(hour).padStart(2, "0")}:${String(
         min
