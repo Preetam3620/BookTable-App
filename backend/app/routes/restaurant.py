@@ -445,14 +445,29 @@ def get_restaurant_detail(
 
     return restaurant
 
+# @router.get(
+#     "/customer/restaurants", response_model=list[RestaurantSchema.RestaurantResponse]
+# )
+# async def get_customer_restaurants(request: Request, db: Session = Depends(database.get_db)):
+#     # Get all approved restaurants
+#     restaurants = (
+#         db.query(RestaurantModel.Restaurant)
+#         .filter(RestaurantModel.Restaurant.is_approved == True)
+#         .all()
+#     )
+#     return restaurants
+
 @router.get(
     "/customer/restaurants", response_model=list[RestaurantSchema.RestaurantResponse]
 )
-async def get_customer_restaurants(request: Request, db: Session = Depends(database.get_db)):
-    # Get all approved restaurants
-    restaurants = (
-        db.query(RestaurantModel.Restaurant)
-        .filter(RestaurantModel.Restaurant.is_approved == True)
-        .all()
-    )
+async def get_all_restaurants(request: Request, db: Session = Depends(database.get_db)):
+    # Check user role for admin privileges
+    user = request.state.user
+    if user["role"] != "customer":
+        raise HTTPException(
+            status_code=403, detail="Not authorized to view all restaurants"
+        )
+
+    # Inline query to retrieve all restaurants
+    restaurants = db.query(RestaurantModel.Restaurant).all()
     return restaurants
