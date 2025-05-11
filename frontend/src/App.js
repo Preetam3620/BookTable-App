@@ -11,6 +11,7 @@ import CustomerBookings from "./CustomerBookings";
 import CustomerRestaurantSearch from "./CustomerRestaurantSearch";
 import ManagerDashboard from "./ManagerDashboard";
 import ProtectedRoute from "./ProtectedRoute";
+import ReadReview from "./ReadReview";
 import Register from "./Register"; // Import the Register component
 import RestaurantList from "./RestaurantList";
 
@@ -106,6 +107,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CustomerBookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/read-review"
+          element={
+            <ProtectedRoute>
+              <ReadReview />
             </ProtectedRoute>
           }
         />

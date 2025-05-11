@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RestaurantList from "./RestaurantList";
 import { getAllAdminRestaurants } from "./api/auth";
+import Header from "./Header";
 
 const dummyRestaurants = [
   {
@@ -124,13 +125,7 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <button
-        className="remove-button"
-        onClick={() => navigate("/adminAnalytics")}
-        style={{ marginLeft: "80%", borderRadius: "2px", width: "20%" }}
-      >
-        Admin Analytics
-      </button>
+     <Header />
       <div class="admin-dashboard-bg">
         <div className="admin-dashboard-overlay">
           <div className="admin-dashboard-content">

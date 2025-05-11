@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Header from "./Header";
 import {
   Bar,
   BarChart,
@@ -128,6 +129,9 @@ const AdminAnalytics = () => {
 
 
   return (
+    <>
+     <Header />
+   
     <div className="analytics-bg">
     <div className="admin-analytics">
       <h2 className="analytics-title">📊 Admin Analytics (Last 30 Days)</h2>
@@ -167,6 +171,7 @@ const AdminAnalytics = () => {
       </div>
       </div>
       </div>
+      </>
   );
 };
 

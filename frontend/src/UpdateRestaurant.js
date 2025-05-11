@@ -23,6 +23,19 @@ const daysOfWeek = [
   "Sunday",
 ];
 
+const generateTimeOptions = () => {
+  const times = [];
+  for (let hour = 8; hour <= 22; hour++) {
+    for (let min = 0; min < 60; min += 30) {
+      const formatted = `${String(hour).padStart(2, "0")}:${String(
+        min
+      ).padStart(2, "0")}`;
+      times.push(formatted);
+    }
+  }
+  return times;
+};
+
 const UpdateRestaurant = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -45,6 +58,13 @@ const UpdateRestaurant = () => {
     };
     fetchData();
   }, [id]);
+
+  const handleAvailabilityChange = (e) => {
+    const selected = Array.from(e.target.selectedOptions).map(
+      (opt) => opt.value
+    );
+    setRestaurant((prev) => ({ ...prev, availability: selected }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,7 +110,7 @@ const UpdateRestaurant = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateRestaurantForManager({id, restaurant});
+      await updateRestaurantForManager({ id, restaurant });
       alert("Restaurant updated successfully!");
       navigate("/managerDashboard");
     } catch (err) {
@@ -220,7 +240,22 @@ const UpdateRestaurant = () => {
                 <option value="5">$$$$$</option>
               </select>
             </div>
-
+            <div className="form-group">
+              <label>Available Time Slots (30-minute intervals)</label>
+              <select
+                multiple
+                value={restaurant.availability}
+                onChange={handleAvailabilityChange}
+                className="selectDescription"
+                size={6}
+              >
+                {generateTimeOptions().map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="form-group">
               <label>Operating Hours</label>
               {restaurant.operating_hours.map((h, idx) => (

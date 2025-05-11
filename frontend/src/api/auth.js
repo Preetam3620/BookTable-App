@@ -96,3 +96,47 @@ export const updateRestaurantForManager = async (data) => {
     throw error;
   }
 };
+
+export const getAllBookings = async () => {
+  try {
+    const response = await API.get("/reservations");
+    return response.data;
+  } catch (error) {
+    console.error("Booking retrieval for customer failed:", error);
+    throw error;
+  }
+};
+
+export const addReview = async (data) => {
+  try {
+    const response = await API.post(
+      `restaurants/${data.restaurant_id}/reviews`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    alert(error.response.data.detail);
+    console.error("review failed:", error);
+    throw error;
+  }
+};
+
+export const getAllCustomers = async () => {
+  try {
+    const response = await API.get("/customer/restaurants");
+    return response.data;
+  } catch (error) {
+    console.error("Booking retrieval for customer failed:", error);
+    throw error;
+  }
+};
+
+export const getAllReviewsForRestaurant = async (data) => {
+  try {
+    const response = await API.get(`/restaurants/${data.restaurantId}/reviews`);
+    return response.data;
+  } catch (error) {
+    console.error("Review get restarurant failed:", error);
+    throw error;
+  }
+};

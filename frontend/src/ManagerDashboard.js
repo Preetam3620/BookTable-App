@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import RestaurantList from "./RestaurantList";
 import { getAllRestaurantsForManager } from "./api/auth";
 import "./styles.css";
+import Header from "./Header";
 
 const dummyRestaurants = [
   {
@@ -203,9 +204,6 @@ const ManagerDashboard = () => {
     fetchData();
   }, []);
 
-  const handleEdit = (id) => {
-    navigate(`/restaurantform/${id}`);
-  };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this listing?")) {
@@ -217,6 +215,8 @@ const ManagerDashboard = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="manager-dashboard-bg">
       <div className="dashboard-content">
         <h1 className="textCenter">Manager Dashboard</h1>
@@ -234,6 +234,7 @@ const ManagerDashboard = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

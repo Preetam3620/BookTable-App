@@ -20,6 +20,19 @@ const daysOfWeek = [
   "Sunday",
 ];
 
+const generateTimeOptions = () => {
+  const times = [];
+  for (let hour = 8; hour <= 22; hour++) {
+    for (let min = 0; min < 60; min += 30) {
+      const formatted = `${String(hour).padStart(2, "0")}:${String(
+        min
+      ).padStart(2, "0")}`;
+      times.push(formatted);
+    }
+  }
+  return times;
+};
+
 const AddRestaurantForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -34,6 +47,7 @@ const AddRestaurantForm = () => {
     email: "",
     phone_number: "",
     cost_rating: "",
+    availability: [],
     operating_hours: [{ day_of_week: "", opening_time: "", closing_time: "" }],
   });
 
@@ -86,6 +100,13 @@ const AddRestaurantForm = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleAvailabilityChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions).map(
+      (opt) => opt.value
+    );
+    setFormData((prev) => ({ ...prev, availability: selectedOptions }));
   };
 
   const handleChange = (e) => {
@@ -313,6 +334,23 @@ const AddRestaurantForm = () => {
               {errors.cost_rating && (
                 <span className="error-text">{errors.cost_rating}</span>
               )}
+            </div>
+
+            <div className="form-group">
+              <label>Select Available Time Slots (30-minute intervals)</label>
+              <select
+                multiple
+                value={formData.availability}
+                onChange={handleAvailabilityChange}
+                className="selectDescription"
+                size={6} // Optional: how many rows to show
+              >
+                {generateTimeOptions().map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Operating Hours */}

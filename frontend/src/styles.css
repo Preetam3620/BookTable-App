@@ -594,6 +594,7 @@ body {
     padding: 20px;
     background-color: #f5f7fa;
     border-radius: 12px; */
+   
     max-width: 1200px;
   margin: auto;
   padding: 20px;
@@ -602,6 +603,7 @@ body {
   -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
   color: white;
+  margin-top: 20px;
   }
   
   .customer-bg {
@@ -974,4 +976,89 @@ body {
   border: 1px solid #ccc;
   margin-top: 8px;
 }
+.logout-fixed-wrapper {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+}
 
+.logout-fixed-btn {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+  width: auto;              /* ✅ ensures it doesn't stretch */
+  display: inline-block;    /* ✅ keeps it inline, not block-level */
+}
+
+
+.read-reviews-bg {
+  position: relative;
+  background-image: url('https://images.pexels.com/photos/6267/menu-restaurant-vintage-table.jpg?auto=compress&cs=tinysrgb&w=1600');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  padding: 50px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.read-reviews-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.read-reviews-container {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 12px;
+  padding: 30px;
+  color: #f0f0f0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Header style */
+.read-reviews-container h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.review-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.2s ease;
+}
+.review-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Text inside cards */
+.review-card p {
+  margin: 8px 0;
+  line-height: 1.4;
+}
+.review-card strong {
+  color: #ffd700; /* gold labels for rating/comment */
+}
+
+/* Timestamp smaller and lighter */
+.review-timestamp {
+  font-size: 0.85rem;
+  color: #ccc;
+}
