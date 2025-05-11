@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   getRestaurantDetailForManager,
   updateRestaurantForManager,
+  managerUpdateOperatingHours,
 } from "./api/auth";
 
 const CostRatingEnum = Object.freeze({
@@ -110,7 +111,10 @@ const UpdateRestaurant = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateRestaurantForManager({ id, restaurant });
+      const updated_restaurant = await updateRestaurantForManager({ id, restaurant });
+      console.log("restaurant updated", updated_restaurant);
+      const operatingHours = await managerUpdateOperatingHours(updated_restaurant.restaurant_id, restaurant.operating_hours);
+      console.log("operating hours updated", operatingHours);
       alert("Restaurant updated successfully!");
       navigate("/managerDashboard");
     } catch (err) {

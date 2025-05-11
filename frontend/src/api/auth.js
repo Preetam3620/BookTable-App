@@ -64,6 +64,24 @@ export const managerAddRestaurant = async (data) => {
   }
 };
 
+export const managerAddOperatingHours = async (restaurantId, data) => {
+  try {
+    // Transform the data to match the expected format
+    const formattedData = {
+      operating_hours: data.map(hour => ({
+        day_of_week: hour.day_of_week.toLowerCase(),
+        opening_time: hour.opening_time.length === 5 ? `${hour.opening_time}:00` : hour.opening_time,
+        closing_time: hour.closing_time.length === 5 ? `${hour.closing_time}:00` : hour.closing_time
+      }))
+    };
+    const response = await API.post(`/manager/restaurants/${restaurantId}/hours`, formattedData);
+    return response.data;
+  } catch (error) {
+    console.error("Registration failed:", error);
+    throw error;
+  }
+};
+
 export const getAllRestaurantsForManager = async (data) => {
   try {
     const response = await API.get("/manager/restaurants");
@@ -93,6 +111,25 @@ export const updateRestaurantForManager = async (data) => {
     return response.data;
   } catch (error) {
     console.error("Registration failed:", error);
+    throw error;
+  }
+};
+
+export const managerUpdateOperatingHours = async (restaurantId, data) => {
+  try {
+    // Transform the data to match the expected format
+    const formattedData = {
+      operating_hours: data.map(hour => ({
+        day_of_week: hour.day_of_week.toLowerCase(),
+        opening_time: hour.opening_time.length === 5 ? `${hour.opening_time}:00` : hour.opening_time,
+        closing_time: hour.closing_time.length === 5 ? `${hour.closing_time}:00` : hour.closing_time
+      }))
+    };
+    
+    const response = await API.put(`/manager/restaurants/${restaurantId}/hours`, formattedData);
+    return response.data;
+  } catch (error) {
+    console.error("Operating hours update failed:", error);
     throw error;
   }
 };

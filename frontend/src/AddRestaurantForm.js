@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { managerAddRestaurant } from "./api/auth";
+import { managerAddRestaurant, managerAddOperatingHours } from "./api/auth";
 
 const CostRatingEnum = Object.freeze({
   1: 1,
@@ -161,7 +161,10 @@ const AddRestaurantForm = () => {
     if (!validate()) return;
 
     try {
-      await managerAddRestaurant(formData);
+      const restaurant = await managerAddRestaurant(formData);
+      console.log("restaurant added", restaurant);
+      const operatingHours = await managerAddOperatingHours(restaurant.restaurant_id, formData.operating_hours);
+      console.log("operating hours added", operatingHours);
       alert("Restaurant submitted successfully!");
       navigate("/managerDashboard");
     } catch (err) {
