@@ -1,5 +1,6 @@
 from datetime import time
 from enum import Enum
+from typing import List
 
 from pydantic import BaseModel, validator
 
@@ -30,3 +31,7 @@ class OperatingHoursCreate(BaseModel):
         if "opening_time" in values and v <= values["opening_time"]:
             raise ValueError("closing_time must be after opening_time")
         return v
+
+
+class OperatingHoursBulkCreate(BaseModel):
+    operating_hours: List[OperatingHoursCreate]

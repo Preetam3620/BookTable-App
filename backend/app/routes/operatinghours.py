@@ -8,7 +8,7 @@ from app.database import get_db
 from app.models import RestaurantModel
 from app.models.OperatingHoursModel import OperatingHours
 from app.schemas import RestaurantSchema
-from app.schemas.OperatingHoursSchema import OperatingHoursCreate
+from app.schemas.OperatingHoursSchema import OperatingHoursCreate, OperatingHoursBulkCreate
 
 # Define the router
 router = APIRouter()
@@ -23,11 +23,11 @@ def check_timeframes(start_1: time, end_1: time, start_2: time, end_2: time) -> 
 
 @router.post(
     "/manager/restaurants/{restaurant_id}/hours",
-    response_model=RestaurantSchema.OperatingHoursResponse,
+    response_model=List[RestaurantSchema.OperatingHoursResponse],
 )
 async def create_operating_hours(
     restaurant_id: int,
-    operating_hours: OperatingHoursCreate,
+    operating_hours: OperatingHoursBulkCreate,
     request: Request,
     db: Session = Depends(get_db),
 ):
@@ -47,41 +47,51 @@ async def create_operating_hours(
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
-    existing_hours = (
-        db.query(OperatingHours)
-        .filter(
-            OperatingHours.restaurant_id == restaurant_id,
-            OperatingHours.day_of_week == operating_hours.day_of_week,
-        )
-        .first()
-    )
-    # Check if the new operating hours conflict with existing ones for the same day of the week.
-    if existing_hours and existing_hours.day_of_week == operating_hours.day_of_week:
-        if not check_timeframes(
-            operating_hours.opening_time,
-            operating_hours.closing_time,
-            existing_hours.opening_time,
-            existing_hours.closing_time,
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail="Operating hours conflict: the specified time frame overlaps with an existing schedule for this day.",
+    created_hours = []
+    for hours in operating_hours.operating_hours:
+        # Check for existing hours for the same day
+        existing_hours = (
+            db.query(OperatingHours)
+            .filter(
+                OperatingHours.restaurant_id == restaurant_id,
+                OperatingHours.day_of_week == hours.day_of_week,
             )
+            .first()
+        )
 
-    # Create new operating hours record.
-    new_operating_hours = OperatingHours(
-        day_of_week=operating_hours.day_of_week,
-        opening_time=operating_hours.opening_time,
-        closing_time=operating_hours.closing_time,
-        restaurant_id=restaurant_id,  # Use restaurant_id from the path
-    )
-    db.add(new_operating_hours)
+        # Check if the new operating hours conflict with existing ones for the same day of the week.
+        if existing_hours:
+            if not check_timeframes(
+                hours.opening_time,
+                hours.closing_time,
+                existing_hours.opening_time,
+                existing_hours.closing_time,
+            ):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Operating hours conflict: the specified time frame overlaps with an existing schedule for {hours.day_of_week}.",
+                )
+
+        # Create new operating hours record
+        new_operating_hours = OperatingHours(
+            day_of_week=hours.day_of_week,
+            opening_time=hours.opening_time,
+            closing_time=hours.closing_time,
+            restaurant_id=restaurant_id,
+        )
+        db.add(new_operating_hours)
+        created_hours.append(new_operating_hours)
+
     db.commit()
-    db.refresh(new_operating_hours)
-    if not new_operating_hours:
+    
+    # Refresh all created records
+    for hours in created_hours:
+        db.refresh(hours)
+
+    if not created_hours:
         raise HTTPException(status_code=400, detail="Failed to create operating hours")
 
-    return new_operating_hours
+    return created_hours
 
 
 @router.get(
@@ -122,14 +132,13 @@ async def get_operating_hours(
 
 
 @router.put(
-    "/manager/restaurants/{restaurant_id}/hours/{hours_id}",
-    response_model=RestaurantSchema.OperatingHoursResponse,
+    "/manager/restaurants/{restaurant_id}/hours",
+    response_model=List[RestaurantSchema.OperatingHoursResponse],
 )
 async def update_operating_hours(
-    restaurant_id: int = Path(..., title="The ID of the restaurant", ge=1),
-    hours_id: int = Path(..., title="The ID of the operating hours entry", ge=1),
-    operating_hours: OperatingHoursCreate = None,
-    request: Request = None,
+    restaurant_id: int,
+    operating_hours: OperatingHoursBulkCreate,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     # Verify that the user is authorized to perform this action.
@@ -148,52 +157,44 @@ async def update_operating_hours(
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
-    # Fetch the operating hours record to be updated.
-    existing_record = (
-        db.query(OperatingHours)
-        .filter(
-            OperatingHours.hours_id == hours_id,
-            OperatingHours.restaurant_id == restaurant_id,
-        )
-        .first()
-    )
-    if not existing_record:
-        raise HTTPException(status_code=404, detail="Operating hours not found")
-
-    # Check for any conflicting operating hours on the same day.
-    # We exclude the record being updated.
-    conflicting_record = (
-        db.query(OperatingHours)
-        .filter(
-            OperatingHours.restaurant_id == restaurant_id,
-            OperatingHours.day_of_week == operating_hours.day_of_week,
-            OperatingHours.hours_id != hours_id,
-        )
-        .first()
-    )
-
-    if conflicting_record:
-        if not check_timeframes(
-            operating_hours.opening_time,
-            operating_hours.closing_time,
-            conflicting_record.opening_time,
-            conflicting_record.closing_time,
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail="Operating hours conflict: the specified time frame overlaps with an existing schedule for this day.",
+    updated_hours = []
+    for hours in operating_hours.operating_hours:
+        # Check for existing hours for the same day
+        existing_hours = (
+            db.query(OperatingHours)
+            .filter(
+                OperatingHours.restaurant_id == restaurant_id,
+                OperatingHours.day_of_week == hours.day_of_week,
             )
+            .first()
+        )
 
-    # Update the fields in the existing record.
-    existing_record.day_of_week = operating_hours.day_of_week
-    existing_record.opening_time = operating_hours.opening_time
-    existing_record.closing_time = operating_hours.closing_time
+        if existing_hours:
+            # Update existing record
+            existing_hours.opening_time = hours.opening_time
+            existing_hours.closing_time = hours.closing_time
+            updated_hours.append(existing_hours)
+        else:
+            # Create new record if it doesn't exist
+            new_operating_hours = OperatingHours(
+                day_of_week=hours.day_of_week,
+                opening_time=hours.opening_time,
+                closing_time=hours.closing_time,
+                restaurant_id=restaurant_id,
+            )
+            db.add(new_operating_hours)
+            updated_hours.append(new_operating_hours)
 
-    # Commit the changes and refresh the instance.
     db.commit()
-    db.refresh(existing_record)
+    
+    # Refresh all updated records
+    for hours in updated_hours:
+        db.refresh(hours)
 
-    return existing_record
+    if not updated_hours:
+        raise HTTPException(status_code=400, detail="Failed to update operating hours")
+
+    return updated_hours
 
 
 @router.delete(
