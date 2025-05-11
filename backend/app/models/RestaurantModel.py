@@ -1,6 +1,5 @@
 import enum
 from datetime import datetime
-
 from sqlalchemy import (
     Boolean,
     Column,
@@ -11,6 +10,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    JSON,
 )
 from sqlalchemy.orm import relationship
 
@@ -58,6 +58,8 @@ class Restaurant(Base):
     avg_rating = Column(Float, default=0.0)
     is_approved = Column(Boolean, default=False)
     approved_at = Column(DateTime, nullable=True)
+    availability = Column(JSON, nullable=True, default=list)  # Store available time slots
+    booked_slots = Column(JSON, nullable=True, default=list)  # Store booked time slots
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

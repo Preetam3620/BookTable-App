@@ -1,8 +1,8 @@
 from datetime import datetime, time
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Any
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, validator
 
 from app.schemas.CustomerReviewSchema import ReviewResponse
 from app.schemas.OperatingHoursSchema import OperatingHoursResponse
@@ -35,6 +35,20 @@ class RestaurantBase(BaseModel):
     email: EmailStr
     cuisine_type: CuisineType
     cost_rating: int = Field(..., ge=1, le=5)
+    availability: Optional[List[str]] = None
+    booked_slots: Optional[List[str]] = None
+
+    @validator('availability', 'booked_slots', pre=True)
+    def parse_json_string(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, str):
+            import json
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return None
+        return v
 
 
 class RestaurantCreate(RestaurantBase):
@@ -55,6 +69,20 @@ class RestaurantUpdate(BaseModel):
     cost_rating: Optional[int] = Field(None, ge=1, le=5)
     is_approved: Optional[bool] = None
     approved_at: Optional[datetime] = None
+    availability: Optional[List[str]] = None
+    booked_slots: Optional[List[str]] = None
+
+    @validator('availability', 'booked_slots', pre=True)
+    def parse_json_string(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, str):
+            import json
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return None
+        return v
 
     class Config:
         from_attributes = True
@@ -70,6 +98,20 @@ class RestaurantResponse(RestaurantBase):
     updated_at: datetime
     photos: List[RestaurantPhotoResponse] = []
     operating_hours: List[OperatingHoursResponse] = []
+    availability: List[str] = Field(default_factory=list)
+    booked_slots: List[str] = Field(default_factory=list)
+
+    @validator('availability', 'booked_slots', pre=True)
+    def parse_json_string(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            import json
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return []
+        return v or []
 
     class Config:
         from_attributes = True
@@ -78,7 +120,6 @@ class RestaurantResponse(RestaurantBase):
 class RestaurantDetailResponse(RestaurantResponse):
     tables: List[TableResponse] = []
     reviews: List[ReviewResponse] = []
-    tables: List[TableResponse] = []
 
     class Config:
         from_attributes = True

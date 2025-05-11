@@ -50,6 +50,8 @@ async def create_restaurant(
         email=restaurant.email,
         cuisine_type=restaurant.cuisine_type,
         cost_rating=restaurant.cost_rating,
+        availability=restaurant.availability,
+        booked_slots=restaurant.booked_slots,
     )
 
     # Add the new restaurant to the DB session, commit the transaction, and refresh to get any auto-generated fields.
@@ -213,6 +215,7 @@ async def get_all_restaurants(request: Request, db: Session = Depends(database.g
     # Inline query to retrieve all restaurants
     restaurants = db.query(RestaurantModel.Restaurant).all()
     return restaurants
+
 
 
 @router.delete("/admin/restaurants/{restaurant_id}", status_code=204)
@@ -441,3 +444,15 @@ def get_restaurant_detail(
         )
 
     return restaurant
+
+@router.get(
+    "/customer/restaurants", response_model=list[RestaurantSchema.RestaurantResponse]
+)
+async def get_customer_restaurants(request: Request, db: Session = Depends(database.get_db)):
+    # Get all approved restaurants
+    restaurants = (
+        db.query(RestaurantModel.Restaurant)
+        .filter(RestaurantModel.Restaurant.is_approved == True)
+        .all()
+    )
+    return restaurants
