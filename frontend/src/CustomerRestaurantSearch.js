@@ -161,7 +161,7 @@ const CustomerRestaurantSearch = () => {
                     <strong>{"$".repeat(r.cost_rating)}</strong>
                   </p>
                   <p>
-                    ⭐ {r.avg_rating} ({r.reviews} reviews) | Booked {""}
+                  {r.avg_rating} ⭐  ({r.reviews.length} reviews) | Booked {""}
                     {r.times_booked_today} times today
                   </p>
                   <p>

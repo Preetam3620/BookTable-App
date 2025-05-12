@@ -32,7 +32,8 @@ const BookRestaurant = () => {
     };
     fetchRestaurants();
   }, []);
-
+  console.log("Restaurants data:", restaurants);
+  const reviews_count = restaurants?.reviews?.length || 0;
   if (!restaurants) return <p>Restaurant not found.</p>;
 
   const handleBook = async () => {
@@ -77,8 +78,8 @@ const BookRestaurant = () => {
           <strong>Cuisine:</strong> {restaurants.cuisine_type}
         </p>
         <p>
-          <strong>Rating:</strong> ⭐ {restaurants.rating} (
-          {restaurants.reviews} reviews)
+          <strong>Rating:</strong> {restaurants.avg_rating} ⭐  (
+          {reviews_count} reviews)
         </p>
 
         <h4>📍 Location</h4>
