@@ -419,13 +419,13 @@ def get_restaurant_detail(
     request: Request,
     db: Session = Depends(database.get_db),
 ):
-    # ensure this endpoint is hit by a customer
-    user = request.state.user
-    if user.get("role") != "customer":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to view restaurant details",
-        )
+    # # ensure this endpoint is hit by a customer
+    # user = request.state.user
+    # if user.get("role") != "customer":
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="Not authorized to view restaurant details",
+    #     )
 
     # fetch only approved restaurants
     restaurant = (
@@ -458,10 +458,10 @@ def get_restaurant_detail(
 #     return restaurants
 
 @router.get(
-    "/customer/restaurants", response_model=list[RestaurantSchema.RestaurantResponse]
+    "/customer/restaurants", response_model=list[RestaurantSchema.RestaurantDetailResponse]
 )
 async def get_all_restaurants(request: Request, db: Session = Depends(database.get_db)):
-    # Check user role for admin privileges
+    # Check user role for customer privileges
     user = request.state.user
     if user["role"] != "customer":
         raise HTTPException(
