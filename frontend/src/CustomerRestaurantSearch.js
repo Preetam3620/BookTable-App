@@ -161,7 +161,7 @@ const CustomerRestaurantSearch = () => {
                     <strong>{"$".repeat(r.cost_rating)}</strong>
                   </p>
                   <p>
-                  {r.avg_rating} ⭐  ({r.reviews.length} reviews) | Booked {""}
+                    {r.avg_rating} ⭐ ({r.reviews.length} reviews) | Booked {""}
                     {r.times_booked_today} times today
                   </p>
                   <p>
@@ -170,6 +170,14 @@ const CustomerRestaurantSearch = () => {
                       className="review-link"
                     >
                       📖 Read Reviews
+                    </Link>
+                  </p>
+                  <p>
+                    <Link
+                      to={`/restaurant-details?restaurant_id=${r.restaurant_id}`}
+                      className="review-link"
+                    >
+                      📖 Restaurant Details
                     </Link>
                   </p>
 

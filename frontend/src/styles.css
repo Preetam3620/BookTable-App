@@ -1061,8 +1061,4 @@ body {
   color: #ffd700; /* gold labels for rating/comment */
 }
 
-/* Timestamp smaller and lighter */
-.review-timestamp {
-  font-size: 0.85rem;
-  color: #ccc;
-}
+

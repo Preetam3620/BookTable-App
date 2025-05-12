@@ -2,18 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   getRestaurantDetailForManager,
-  updateRestaurantForManager,
   managerUpdateOperatingHours,
+  managerUpdateTables,
+  updateRestaurantForManager,
 } from "./api/auth";
 
-const CostRatingEnum = Object.freeze({
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5,
-});
-
+const CostRatingEnum = Object.freeze({ 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 });
 const daysOfWeek = [
   "Monday",
   "Tuesday",
@@ -23,15 +17,13 @@ const daysOfWeek = [
   "Saturday",
   "Sunday",
 ];
-
 const generateTimeOptions = () => {
   const times = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let min = 0; min < 60; min += 30) {
-      const formatted = `${String(hour).padStart(2, "0")}:${String(
-        min
-      ).padStart(2, "0")}`;
-      times.push(formatted);
+      times.push(
+        `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}`
+      );
     }
   }
   return times;
@@ -47,10 +39,13 @@ const UpdateRestaurant = () => {
     const fetchData = async () => {
       try {
         const res = await getRestaurantDetailForManager({ id });
-        if (!res.operating_hours || !Array.isArray(res.operating_hours)) {
+        if (!Array.isArray(res.operating_hours)) {
           res.operating_hours = [
             { day_of_week: "", opening_time: "", closing_time: "" },
           ];
+        }
+        if (!Array.isArray(res.tables)) {
+          res.tables = [{ table_number: "", capacity: "" }];
         }
         setRestaurant(res);
       } catch (err) {
@@ -60,21 +55,17 @@ const UpdateRestaurant = () => {
     fetchData();
   }, [id]);
 
-  const handleAvailabilityChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map(
-      (opt) => opt.value
-    );
-    setRestaurant((prev) => ({ ...prev, availability: selected }));
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let newValue = value;
-    if (name === "cost_rating") {
-      newValue = CostRatingEnum[value] ?? "";
-    }
+    const newValue =
+      name === "cost_rating" ? CostRatingEnum[value] ?? "" : value;
     setRestaurant((prev) => ({ ...prev, [name]: newValue }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const handleAvailabilityChange = (e) => {
+    const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
+    setRestaurant((prev) => ({ ...prev, availability: selected }));
   };
 
   const handleHoursChange = (idx, field, value) => {
@@ -108,13 +99,56 @@ const UpdateRestaurant = () => {
     }));
   };
 
+  const handleTableChange = (idx, field, value) => {
+    setRestaurant((prev) => {
+      const newTables = prev.tables.map((t, i) =>
+        i === idx ? { ...t, [field]: value } : t
+      );
+      return { ...prev, tables: newTables };
+    });
+  };
+
+  const addTable = () => {
+    setRestaurant((prev) => ({
+      ...prev,
+      tables: [...prev.tables, { table_number: "", capacity: "" }],
+    }));
+  };
+
+  const removeTable = (idx) => {
+    setRestaurant((prev) => ({
+      ...prev,
+      tables: prev.tables.filter((_, i) => i !== idx),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updated_restaurant = await updateRestaurantForManager({ id, restaurant });
-      console.log("restaurant updated", updated_restaurant);
-      const operatingHours = await managerUpdateOperatingHours(updated_restaurant.restaurant_id, restaurant.operating_hours);
-      console.log("operating hours updated", operatingHours);
+      // 1) Update basic restaurant info
+      const { operating_hours, tables, ...basicInfo } = restaurant;
+      const updated = await updateRestaurantForManager({
+        id,
+        restaurant: basicInfo,
+      });
+      const rstId = updated.restaurant_id;
+
+      // 2) Prepare payloads
+      const tablesPayload = tables.map((t) => ({
+        table_number: Number(t.table_number),
+        capacity: Number(t.capacity),
+        is_active: true,
+      }));
+
+      // 3) Run follow-up updates in parallel
+      const [hrsRes, tblsRes] = await Promise.all([
+        managerUpdateOperatingHours(rstId, operating_hours),
+        managerUpdateTables(rstId, { tables: tablesPayload }),
+      ]);
+
+      console.log("hours updated", hrsRes);
+      console.log("tables updated", tblsRes);
+
       alert("Restaurant updated successfully!");
       navigate("/managerDashboard");
     } catch (err) {
@@ -131,6 +165,7 @@ const UpdateRestaurant = () => {
         <div className="add-restaurant-container">
           <h2>Update Restaurant</h2>
           <form onSubmit={handleSubmit} className="restaurant-form" noValidate>
+            {/* Name */}
             <div className="form-group">
               <input
                 name="name"
@@ -140,6 +175,7 @@ const UpdateRestaurant = () => {
               />
             </div>
 
+            {/* Description */}
             <div className="form-group">
               <textarea
                 name="description"
@@ -150,6 +186,7 @@ const UpdateRestaurant = () => {
               />
             </div>
 
+            {/* Cuisine Type */}
             <div className="form-group">
               <select
                 name="cuisine_type"
@@ -170,6 +207,7 @@ const UpdateRestaurant = () => {
               </select>
             </div>
 
+            {/* Address */}
             <div className="form-group">
               <input
                 name="address_line1"
@@ -187,6 +225,7 @@ const UpdateRestaurant = () => {
               />
             </div>
 
+            {/* City, State, Zip */}
             <div className="form-group">
               <input
                 name="city"
@@ -212,6 +251,7 @@ const UpdateRestaurant = () => {
               />
             </div>
 
+            {/* Contact */}
             <div className="form-group">
               <input
                 name="email"
@@ -229,6 +269,7 @@ const UpdateRestaurant = () => {
               />
             </div>
 
+            {/* Cost Rating */}
             <div className="form-group">
               <select
                 name="cost_rating"
@@ -244,6 +285,8 @@ const UpdateRestaurant = () => {
                 <option value="5">$$$$$</option>
               </select>
             </div>
+
+            {/* Availability */}
             <div className="form-group">
               <label>Available Time Slots (30-minute intervals)</label>
               <select
@@ -260,6 +303,8 @@ const UpdateRestaurant = () => {
                 ))}
               </select>
             </div>
+
+            {/* Operating Hours */}
             <div className="form-group">
               <label>Operating Hours</label>
               {restaurant.operating_hours.map((h, idx) => (
@@ -310,6 +355,48 @@ const UpdateRestaurant = () => {
               </button>
             </div>
 
+            {/* Tables Configuration */}
+            <div className="form-group">
+              <label>Tables Configuration</label>
+              {restaurant.tables.map((tbl, idx) => (
+                <div key={idx} className="table-row">
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Table No."
+                    value={tbl.table_number}
+                    onChange={(e) =>
+                      handleTableChange(idx, "table_number", e.target.value)
+                    }
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Capacity"
+                    value={tbl.capacity}
+                    onChange={(e) =>
+                      handleTableChange(idx, "capacity", e.target.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="remove-table-btn"
+                    onClick={() => removeTable(idx)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="add-table-btn"
+                onClick={addTable}
+              >
+                + Add Table
+              </button>
+            </div>
+
+            {/* Submit */}
             <button type="submit" className="submit-button">
               Save
             </button>

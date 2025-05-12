@@ -103,7 +103,7 @@ export const getAllRestaurantsForManager = async (data) => {
 
 export const getRestaurantDetailForManager = async (data) => {
   try {
-    const response = await API.get(`/manager/restaurants/${data.id}`);
+    const response = await API.get(`/restaurants/${data.id}`);
     return response.data;
   } catch (error) {
     console.error("Registration failed:", error);

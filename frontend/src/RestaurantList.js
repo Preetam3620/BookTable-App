@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { adminApproveRestaurant, adminRemoveRestaurant } from "./api/auth";
 import "./styles.css";
 
@@ -79,12 +79,22 @@ const RestaurantList = ({
                 </>
               )
             ) : (
-              <button
-                className="update-button"
-                onClick={() => handleUpdateClick(restaurant.restaurant_id)}
-              >
-                ✏️ Update
-              </button>
+              <>
+                <p>
+                  <Link
+                    to={`/restaurant-details?restaurant_id=${restaurant.restaurant_id}`}
+                    className="review-link"
+                  >
+                    📖 Restaurant Details
+                  </Link>
+                </p>
+                <button
+                  className="update-button"
+                  onClick={() => handleUpdateClick(restaurant.restaurant_id)}
+                >
+                  ✏️ Update
+                </button>
+              </>
             )}
           </div>
         ))}

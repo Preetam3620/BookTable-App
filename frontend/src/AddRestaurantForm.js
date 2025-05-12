@@ -53,7 +53,7 @@ const AddRestaurantForm = () => {
     cost_rating: "",
     availability: [],
     operating_hours: [{ day_of_week: "", opening_time: "", closing_time: "" }],
-    tables: [{ table_no: "", table_size: "" }],
+    tables: [{ table_number: "", capacity: "" }],
   });
 
   const [errors, setErrors] = useState({});
@@ -118,7 +118,7 @@ const AddRestaurantForm = () => {
   const addTable = () => {
     setFormData((prev) => ({
       ...prev,
-      tables: [...prev.tables, { table_no: "", table_size: "" }],
+      tables: [...prev.tables, { table_number: "", capacity: "" }],
     }));
   };
 
@@ -198,14 +198,15 @@ const AddRestaurantForm = () => {
 
       // 3) build your tables payload
       const tablesPayload = tables.map((tbl) => ({
-        table_no: Number(tbl.table_no),
-        table_size: Number(tbl.table_size),
+        table_number: Number(tbl.table_number),
+        capacity: Number(tbl.capacity),
+        is_active: true,
       }));
 
       // 4) only now—and in parallel—call the other two APIs
       const [hoursRes, tablesRes] = await Promise.all([
         managerAddOperatingHours(id, operating_hours),
-        managerAddTables(id, tablesPayload),
+        managerAddTables(id, { tables: tablesPayload }),
       ]);
 
       console.log("operating hours added", hoursRes);
@@ -463,21 +464,21 @@ const AddRestaurantForm = () => {
                   <input
                     type="number"
                     min="1"
-                    name={`table_no_${idx}`}
+                    name={`table_number_${idx}`}
                     placeholder="Table No."
-                    value={tbl.table_no}
+                    value={tbl.table_number}
                     onChange={(e) =>
-                      handleTableChange(idx, "table_no", e.target.value)
+                      handleTableChange(idx, "table_number", e.target.value)
                     }
                   />
                   <input
                     type="number"
                     min="1"
-                    name={`table_size_${idx}`}
+                    name={`capacity_${idx}`}
                     placeholder="Table Size"
-                    value={tbl.table_size}
+                    value={tbl.capacity}
                     onChange={(e) =>
-                      handleTableChange(idx, "table_size", e.target.value)
+                      handleTableChange(idx, "capacity", e.target.value)
                     }
                   />
                   <button

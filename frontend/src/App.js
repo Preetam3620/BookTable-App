@@ -13,6 +13,7 @@ import ManagerDashboard from "./ManagerDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import ReadReview from "./ReadReview";
 import Register from "./Register"; // Import the Register component
+import RestaurantDetails from "./RestaurantDetails";
 import RestaurantList from "./RestaurantList";
 
 import "./styles.css";
@@ -115,6 +116,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ReadReview />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/restaurant-details"
+          element={
+            <ProtectedRoute>
+              <RestaurantDetails />
             </ProtectedRoute>
           }
         />
