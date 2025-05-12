@@ -67,6 +67,16 @@ async def add_restaurant_review(
     db.commit()
     db.refresh(new_review)
 
+    # Calculate new average rating
+    all_reviews = db.query(Review).filter(Review.restaurant_id == restaurant_id).all()
+    total_rating = sum(review.rating for review in all_reviews)
+    avg_rating = total_rating / len(all_reviews)
+
+    # Update restaurant's average rating
+    restaurant.avg_rating = avg_rating
+    db.commit()
+    db.refresh(restaurant)  # Refresh the restaurant object
+
     return new_review
 
 
@@ -127,6 +137,18 @@ async def update_review(
 
     db.commit()
     db.refresh(review)
+
+    # Calculate new average rating after update
+    all_reviews = db.query(Review).filter(Review.restaurant_id == review.restaurant_id).all()
+    total_rating = sum(review.rating for review in all_reviews)
+    avg_rating = total_rating / len(all_reviews)
+
+    # Update restaurant's average rating
+    restaurant = db.query(Restaurant).filter(Restaurant.restaurant_id == review.restaurant_id).first()
+    restaurant.avg_rating = avg_rating
+    db.commit()
+    db.refresh(restaurant)  # Refresh the restaurant object
+
     return review
 
 
