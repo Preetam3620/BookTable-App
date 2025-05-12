@@ -63,7 +63,7 @@ async def create_restaurant(
 
 
 @router.get(
-    "/manager/restaurants", response_model=list[RestaurantSchema.RestaurantResponse]
+    "/manager/restaurants", response_model=list[RestaurantSchema.RestaurantDetailResponse]
 )
 async def get_restaurants_by_manager(
     request: Request, db: Session = Depends(database.get_db)
