@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { managerAddRestaurant, managerAddOperatingHours } from "./api/auth";
+import {
+  managerAddOperatingHours,
+  managerAddRestaurant,
+  managerAddTables,
+} from "./api/auth";
 
 const CostRatingEnum = Object.freeze({
   1: 1,
@@ -49,6 +53,7 @@ const AddRestaurantForm = () => {
     cost_rating: "",
     availability: [],
     operating_hours: [{ day_of_week: "", opening_time: "", closing_time: "" }],
+    tables: [{ table_no: "", table_size: "" }],
   });
 
   const [errors, setErrors] = useState({});
@@ -100,6 +105,28 @@ const AddRestaurantForm = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleTableChange = (idx, field, value) => {
+    setFormData((prev) => {
+      const newTables = [...prev.tables];
+      newTables[idx] = { ...newTables[idx], [field]: value };
+      return { ...prev, tables: newTables };
+    });
+  };
+
+  const addTable = () => {
+    setFormData((prev) => ({
+      ...prev,
+      tables: [...prev.tables, { table_no: "", table_size: "" }],
+    }));
+  };
+
+  const removeTable = (idx) => {
+    setFormData((prev) => ({
+      ...prev,
+      tables: prev.tables.filter((_, i) => i !== idx),
+    }));
   };
 
   const handleAvailabilityChange = (e) => {
@@ -160,14 +187,34 @@ const AddRestaurantForm = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    // 1) pull out what we’ll POST later, and keep only basicInfo for the first call
+    const { operating_hours, tables, ...basicInfo } = formData;
+
     try {
-      const restaurant = await managerAddRestaurant(formData);
+      // 2) create the restaurant record
+      const restaurant = await managerAddRestaurant(basicInfo);
+      const id = restaurant.restaurant_id;
       console.log("restaurant added", restaurant);
-      const operatingHours = await managerAddOperatingHours(restaurant.restaurant_id, formData.operating_hours);
-      console.log("operating hours added", operatingHours);
+
+      // 3) build your tables payload
+      const tablesPayload = tables.map((tbl) => ({
+        table_no: Number(tbl.table_no),
+        table_size: Number(tbl.table_size),
+      }));
+
+      // 4) only now—and in parallel—call the other two APIs
+      const [hoursRes, tablesRes] = await Promise.all([
+        managerAddOperatingHours(id, operating_hours),
+        managerAddTables(id, tablesPayload),
+      ]);
+
+      console.log("operating hours added", hoursRes);
+      console.log("tables added", tablesRes);
+
       alert("Restaurant submitted successfully!");
       navigate("/managerDashboard");
     } catch (err) {
+      // if managerAddRestaurant throws, you’ll end up here and never call the other two
       console.error("Error submitting form:", err);
       alert("Something went wrong while submitting the form.");
     }
@@ -406,6 +453,48 @@ const AddRestaurantForm = () => {
                 onClick={addOperatingHour}
               >
                 + Add Hours
+              </button>
+            </div>
+
+            <div className="form-group">
+              <label>Tables Configuration</label>
+              {formData.tables.map((tbl, idx) => (
+                <div key={idx} className="table-row">
+                  <input
+                    type="number"
+                    min="1"
+                    name={`table_no_${idx}`}
+                    placeholder="Table No."
+                    value={tbl.table_no}
+                    onChange={(e) =>
+                      handleTableChange(idx, "table_no", e.target.value)
+                    }
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    name={`table_size_${idx}`}
+                    placeholder="Table Size"
+                    value={tbl.table_size}
+                    onChange={(e) =>
+                      handleTableChange(idx, "table_size", e.target.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="remove-table-btn"
+                    onClick={() => removeTable(idx)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="add-table-btn"
+                onClick={addTable}
+              >
+                + Add Table
               </button>
             </div>
 

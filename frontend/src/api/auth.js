@@ -68,13 +68,22 @@ export const managerAddOperatingHours = async (restaurantId, data) => {
   try {
     // Transform the data to match the expected format
     const formattedData = {
-      operating_hours: data.map(hour => ({
+      operating_hours: data.map((hour) => ({
         day_of_week: hour.day_of_week.toLowerCase(),
-        opening_time: hour.opening_time.length === 5 ? `${hour.opening_time}:00` : hour.opening_time,
-        closing_time: hour.closing_time.length === 5 ? `${hour.closing_time}:00` : hour.closing_time
-      }))
+        opening_time:
+          hour.opening_time.length === 5
+            ? `${hour.opening_time}:00`
+            : hour.opening_time,
+        closing_time:
+          hour.closing_time.length === 5
+            ? `${hour.closing_time}:00`
+            : hour.closing_time,
+      })),
     };
-    const response = await API.post(`/manager/restaurants/${restaurantId}/hours`, formattedData);
+    const response = await API.post(
+      `/manager/restaurants/${restaurantId}/hours`,
+      formattedData
+    );
     return response.data;
   } catch (error) {
     console.error("Registration failed:", error);
@@ -119,14 +128,23 @@ export const managerUpdateOperatingHours = async (restaurantId, data) => {
   try {
     // Transform the data to match the expected format
     const formattedData = {
-      operating_hours: data.map(hour => ({
+      operating_hours: data.map((hour) => ({
         day_of_week: hour.day_of_week.toLowerCase(),
-        opening_time: hour.opening_time.length === 5 ? `${hour.opening_time}:00` : hour.opening_time,
-        closing_time: hour.closing_time.length === 5 ? `${hour.closing_time}:00` : hour.closing_time
-      }))
+        opening_time:
+          hour.opening_time.length === 5
+            ? `${hour.opening_time}:00`
+            : hour.opening_time,
+        closing_time:
+          hour.closing_time.length === 5
+            ? `${hour.closing_time}:00`
+            : hour.closing_time,
+      })),
     };
-    
-    const response = await API.put(`/manager/restaurants/${restaurantId}/hours`, formattedData);
+
+    const response = await API.put(
+      `/manager/restaurants/${restaurantId}/hours`,
+      formattedData
+    );
     return response.data;
   } catch (error) {
     console.error("Operating hours update failed:", error);
@@ -185,6 +203,32 @@ export const bookReservation = async (data) => {
   } catch (error) {
     alert(error.response.data.detail);
     console.error("review failed:", error);
+    throw error;
+  }
+};
+
+export const managerAddTables = async (restaurantId, data) => {
+  try {
+    const response = await API.post(
+      `/manager/restaurants/${restaurantId}/tables`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Tables add failed:", error);
+    throw error;
+  }
+};
+
+export const managerUpdateTables = async (restaurantId, data) => {
+  try {
+    const response = await API.put(
+      `/manager/restaurants/${restaurantId}/tables`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Tables update failed:", error);
     throw error;
   }
 };
