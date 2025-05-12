@@ -64,25 +64,6 @@ async def book_table(
     table.is_active = False
     db.add(table)
 
-    # 3) Look up the ReservationSlot for this restaurant & time
-    slot = (
-        db.query(ReservationSlot)
-        .filter(
-            ReservationSlot.restaurant_id == reservation.restaurant_id,
-            ReservationSlot.slot_time == reservation.reservation_time,
-            ReservationSlot.is_active == True,
-        )
-        .with_for_update()  # optional: lock the row to avoid race conditions
-        .first()
-    )
-    if not slot or slot.available_tables < 1:
-        raise HTTPException(400, "No available tables at this time slot")
-
-    # 4) Decrement the slot’s counter (and deactivate if zero)
-    slot.available_tables -= 1
-    if slot.available_tables == 0:
-        slot.is_active = False
-    db.add(slot)
 
     # 5) Generate a confirmation code
     confirmation_code = "".join(
@@ -166,15 +147,28 @@ async def list_reservations(
     if not customer:
         raise HTTPException(404, "Customer record not found")
 
-    # Retrieve all reservations for this customer
+    # Retrieve all reservations for this customer with restaurant information
     reservations = (
-        db.query(ReservationModel.Reservation)
+        db.query(ReservationModel.Reservation, RestaurantModel.Restaurant.name)
+        .join(
+            RestaurantModel.Restaurant,
+            ReservationModel.Reservation.restaurant_id == RestaurantModel.Restaurant.restaurant_id
+        )
         .filter(ReservationModel.Reservation.customer_id == customer.customer_id)
         .order_by(ReservationModel.Reservation.reservation_time)
         .all()
     )
 
-    return reservations
+    # Transform the results to include restaurant name
+    result = []
+    for reservation, restaurant_name in reservations:
+        reservation_dict = {
+            **reservation.__dict__,
+            "restaurant_name": restaurant_name
+        }
+        result.append(reservation_dict)
+
+    return result
 
 
 @router.get(
@@ -357,20 +351,6 @@ async def cancel_reservation(
         table.is_active = True
         db.add(table)
 
-    # 7) Reactivate the slot: increment available_tables, mark active
-    slot = (
-        db.query(ReservationSlot)
-        .filter(
-            ReservationSlot.restaurant_id == reservation.restaurant_id,
-            ReservationSlot.slot_time == reservation.reservation_time,
-        )
-        .with_for_update()
-        .first()
-    )
-    if slot:
-        slot.available_tables += 1
-        slot.is_active = True
-        db.add(slot)
 
     # 8) Commit all changes
     db.commit()

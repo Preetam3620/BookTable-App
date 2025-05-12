@@ -88,10 +88,12 @@ const CustomerRestaurantSearch = () => {
         r.state.toLowerCase().includes(filters.location.toLowerCase()) ||
         r.zip_code.includes(filters.location);
 
-      const hasAvailableSlot = r.availability?.some(
-        (slot) => nearbyTimes.includes(slot) && !r.booked_slots?.includes(slot)
-      );
-
+      // const hasAvailableSlot = r.availability?.some(
+      //   (slot) => nearbyTimes.includes(slot) && !r.booked_slots?.includes(slot)
+      // );
+      const hasAvailableSlot =
+        r.availability?.some((slot) => nearbyTimes.includes(slot)) &&
+        r.tables.some((t) => t.is_active === true);
       return matchesLocation && hasAvailableSlot;
     });
 

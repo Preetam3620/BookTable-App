@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
-import { addReview, getAllBookings } from "./api/auth";
+import { addReview, cancelCustomerBooking, getAllBookings } from "./api/auth";
 
 const CustomerBookings = () => {
   const [reservations, setReservations] = useState([]);
@@ -24,12 +24,26 @@ const CustomerBookings = () => {
     try {
       await addReview({
         restaurant_id: selected.restaurant_id,
-        rating: parseInt(rating),
+        rating: parseInt(rating, 10),
         comment: comment.trim(),
       });
       alert("Review submitted successfully!");
+      setSelected(null);
     } catch (err) {
       console.error("Error submitting review:", err);
+    }
+  };
+
+  const handleCancel = async (reservation_id) => {
+    try {
+      await cancelCustomerBooking({ reservation_id });
+      alert("Booking canceled");
+      // // remove from UI or refetch:
+      // setReservations((res) =>
+      //   res.filter((r) => r.reservation_id !== reservation_id)
+      // );
+    } catch (err) {
+      console.error("Error cancelling:", err);
     }
   };
 
@@ -47,6 +61,9 @@ const CustomerBookings = () => {
                 <h3>Reservation #{res.reservation_id}</h3>
                 <p>
                   <strong>Restaurant ID:</strong> {res.restaurant_id}
+                </p>
+                <p>
+                  <strong>Restaurant name:</strong> {res.restaurant_name}
                 </p>
                 <p>
                   <strong>Party Size:</strong> {res.party_size}
@@ -69,11 +86,6 @@ const CustomerBookings = () => {
                     <strong>Special Requests:</strong> {res.special_requests}
                   </p>
                 )}
-                <p className="small-text">
-                  <em>Created: {new Date(res.created_at).toLocaleString()}</em>
-                  <br />
-                  <em>Updated: {new Date(res.updated_at).toLocaleString()}</em>
-                </p>
 
                 {res.status.toLowerCase() === "completed" && (
                   <button
@@ -81,6 +93,15 @@ const CustomerBookings = () => {
                     className="review-button"
                   >
                     Leave a Review
+                  </button>
+                )}
+
+                {res.status.toLowerCase() === "confirmed" && (
+                  <button
+                    onClick={() => handleCancel(res.reservation_id)}
+                    className="cancel-button"
+                  >
+                    Cancel Booking
                   </button>
                 )}
               </div>

@@ -361,8 +361,6 @@ const UpdateRestaurant = () => {
               {restaurant.tables.map((tbl, idx) => (
                 <div key={idx} className="table-row">
                   <input
-                    type="number"
-                    min="1"
                     placeholder="Table No."
                     value={tbl.table_number}
                     onChange={(e) =>

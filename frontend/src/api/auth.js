@@ -232,3 +232,13 @@ export const managerUpdateTables = async (restaurantId, data) => {
     throw error;
   }
 };
+
+export const cancelCustomerBooking = async (data) => {
+  try {
+    const response = await API.delete(`/reservations/${data.reservation_id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Removing booking failed for customer:", error);
+    throw error;
+  }
+};

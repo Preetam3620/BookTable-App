@@ -34,6 +34,7 @@ class ReservationResponse(ReservationBase):
     reservation_id: int
     customer_id: int
     restaurant_id: int
+    restaurant_name: str
     table_id: int
     status: ReservationStatus
     created_at: datetime

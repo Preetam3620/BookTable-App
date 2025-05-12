@@ -21,6 +21,10 @@ const BookRestaurant = () => {
   const time = searchParams.get("time");
   const date = searchParams.get("date");
 
+  function toIsoZ(str) {
+    return str.trim().replace(" ", "T") + "Z";
+  }
+
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
@@ -41,14 +45,17 @@ const BookRestaurant = () => {
     try {
       await bookReservation({
         restaurant_id: restaurants.restaurant_id,
-        table_id: 4,
-        reservation_time: dateAndSlot,
-        party_size: people,
+        table_id: restaurants.tables.find(
+          (t) => t.capacity >= people && t.is_active === true
+        ).table_id,
+        reservation_time: toIsoZ(dateAndSlot),
+        party_size: Number(people),
         special_requests: specialRequest,
       });
       alert(
         `✅ Table booked at ${restaurants.name} for ${time}. Confirmation sent!`
       );
+      navigate("/my-bookings");
     } catch (err) {
       console.error("Error booking", err);
     }
@@ -57,8 +64,7 @@ const BookRestaurant = () => {
   };
 
   const handleCancel = () => {
-    alert("❌ Booking canceled.");
-    navigate("/");
+    navigate("/custDashboard");
   };
 
   return (
@@ -78,8 +84,8 @@ const BookRestaurant = () => {
           <strong>Cuisine:</strong> {restaurants.cuisine_type}
         </p>
         <p>
-          <strong>Rating:</strong> {restaurants.avg_rating} ⭐  (
-          {reviews_count} reviews)
+          <strong>Rating:</strong> {restaurants.avg_rating} ⭐ ({reviews_count}{" "}
+          reviews)
         </p>
 
         <h4>📍 Location</h4>
@@ -102,7 +108,7 @@ const BookRestaurant = () => {
 
         <h4>🪑 Booking Actions</h4>
         <button onClick={handleBook}>Book Table</button>
-        <button onClick={handleCancel}>Cancel Booking</button>
+        <button onClick={handleCancel}>Discard Booking</button>
       </div>
     </div>
   );
