@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -11,6 +11,10 @@ class TableBase(BaseModel):
 
 class TableCreate(TableBase):
     pass
+
+
+class TableBulkCreate(BaseModel):  # Add this new class
+    tables: List[TableCreate]
 
 
 class TableUpdate(BaseModel):
