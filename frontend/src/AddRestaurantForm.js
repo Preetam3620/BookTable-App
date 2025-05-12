@@ -198,7 +198,7 @@ const AddRestaurantForm = () => {
 
       // 3) build your tables payload
       const tablesPayload = tables.map((tbl) => ({
-        table_number: Number(tbl.table_number),
+        table_number: (tbl.table_number),
         capacity: Number(tbl.capacity),
         is_active: true,
       }));
@@ -462,8 +462,6 @@ const AddRestaurantForm = () => {
               {formData.tables.map((tbl, idx) => (
                 <div key={idx} className="table-row">
                   <input
-                    type="number"
-                    min="1"
                     name={`table_number_${idx}`}
                     placeholder="Table No."
                     value={tbl.table_number}

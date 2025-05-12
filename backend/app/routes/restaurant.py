@@ -6,7 +6,7 @@ from sqlalchemy import Table, func, or_
 
 from app import database
 from app.models import RestaurantManagerModel, RestaurantModel, TableModel
-from app.models import ReservationSlotModel
+from app.models import ReservationSlotModel, OperatingHoursModel
 from app.schemas import RestaurantSchema
 
 from app.models.RestaurantModel import Restaurant
@@ -238,6 +238,11 @@ async def delete_restaurant_admin(
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
+        # Delete related records first
+    db.query(OperatingHoursModel.OperatingHours).filter(
+        OperatingHoursModel.OperatingHours.restaurant_id == restaurant_id
+    ).delete()
+    
     db.delete(restaurant)
     db.commit()
     return {"detail": "Restaurant deleted successfully"}
