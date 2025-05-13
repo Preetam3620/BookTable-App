@@ -84,7 +84,20 @@ async def book_table(
 
     db.commit()
     db.refresh(new_reservation)
-    return new_reservation
+
+    # Get restaurant name for the response
+    restaurant = (
+        db.query(RestaurantModel.Restaurant)
+        .filter(RestaurantModel.Restaurant.restaurant_id == reservation.restaurant_id)
+        .first()
+    )
+    
+    # Create response with restaurant name
+    response_dict = {
+        **new_reservation.__dict__,
+        "restaurant_name": restaurant.name if restaurant else None
+    }
+    return response_dict
 
 
 @router.get(
@@ -279,7 +292,7 @@ async def update_reservation(
     if not slot or slot.available_tables < 1:
         raise HTTPException(400, "No available tables at this time slot")
 
-    # 5c) Decrement the slot’s counter (and deactivate if zero)
+    # 5c) Decrement the slot's counter (and deactivate if zero)
     slot.available_tables -= 1
     if slot.available_tables == 0:
         slot.is_active = False
