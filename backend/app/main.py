@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.routes import email  # Add this import
 from fastapi.middleware.cors import CORSMiddleware
 from app.auth.auth_middleware import AuthMiddleware
 from app.routes import (
@@ -36,6 +37,7 @@ app.include_router(reservationslots.router, prefix="/api", tags=["Reservation Sl
 app.include_router(customerreviews.router, prefix="/api", tags=["Customer Reviews"])
 app.include_router(reservation.router, prefix="/api", tags=["Reservations"])
 app.include_router(photos.router, prefix="/api", tags=["Photos"])
+app.include_router(email.router, prefix="/api", tags=["email"])
 
 if __name__ == "__main__":
     import uvicorn

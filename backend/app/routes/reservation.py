@@ -2,6 +2,8 @@ import random
 import string
 from datetime import datetime
 from typing import Any, Dict, List
+from app.routes.email import send_email_notification  # Import your email function
+
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
@@ -97,6 +99,47 @@ async def book_table(
         **new_reservation.__dict__,
         "restaurant_name": restaurant.name if restaurant else None
     }
+
+       # --- EMAIL NOTIFICATION LOGIC STARTS HERE ---
+    # Get user info (email, name)
+    user_obj = (
+        db.query(CustomerModel.Customer)
+        .filter(CustomerModel.Customer.customer_id == new_reservation.customer_id)
+        .first()
+    )
+    user_email = user["email"]  # or user_obj.email if available
+    user_name = user.get("first_name", "Customer")
+
+    subject = f"Booking Confirmation - {restaurant.name}"
+    body = f"""
+    <html>
+        <body>
+            <h2>Booking Confirmation</h2>
+            <p>Dear {user_name},</p>
+            <p>Your table has been successfully booked at {restaurant.name}.</p>
+            <h3>Booking Details:</h3>
+            <ul>
+                <li>Restaurant: {restaurant.name}</li>
+                <li>Date: {new_reservation.reservation_time.strftime('%Y-%m-%d')}</li>
+                <li>Time: {new_reservation.reservation_time.strftime('%H:%M')}</li>
+                <li>Party Size: {new_reservation.party_size}</li>
+                <li>Confirmation Code: {new_reservation.confirmation_code}</li>
+            </ul>
+            <p>Special Requests: {new_reservation.special_requests or 'None'}</p>
+            <p>Restaurant Address: {restaurant.address_line1}, {restaurant.city}, {restaurant.state} {restaurant.zip_code}</p>
+            <p>Restaurant Phone: {restaurant.phone_number}</p>
+            <p>Thank you for choosing BookTable!</p>
+        </body>
+    </html>
+    """
+
+    # Send the email (handle exceptions gracefully)
+    try:
+        send_email_notification(user_email, subject, body)
+    except Exception as e:
+        print(f"Failed to send confirmation email: {e}")
+
+    # --- END EMAIL LOGIC ---
     return response_dict
 
 
