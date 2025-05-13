@@ -104,7 +104,6 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       const res = await getAllAdminRestaurants();
-      console.log("Admin restaurants:", res);
       setApprovedRestaurants(
         res.filter((restaurant) => restaurant.is_approved)
       ); // store in state if needed

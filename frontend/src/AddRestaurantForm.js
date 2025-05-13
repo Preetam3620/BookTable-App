@@ -453,7 +453,7 @@ const AddRestaurantForm = () => {
                 className="add-hour-btn"
                 onClick={addOperatingHour}
               >
-                + Add Hours
+                + Add Operating Hours
               </button>
             </div>
 
