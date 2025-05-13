@@ -151,6 +151,7 @@ async def update_tables(
             # Update existing table
             existing_table.capacity = table.capacity
             existing_table.is_active = table.is_active
+            existing_table.table_number = table.table_number
             updated_tables.append(existing_table)
         else:
             # Create new table if it doesn't exist

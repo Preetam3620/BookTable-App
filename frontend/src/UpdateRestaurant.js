@@ -135,9 +135,9 @@ const UpdateRestaurant = () => {
 
       // 2) Prepare payloads
       const tablesPayload = tables.map((t) => ({
-        table_number: Number(t.table_number),
+        table_number: t.table_number,
         capacity: Number(t.capacity),
-        is_active: true,
+        is_active: true
       }));
 
       // 3) Run follow-up updates in parallel

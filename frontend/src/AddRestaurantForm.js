@@ -198,7 +198,7 @@ const AddRestaurantForm = () => {
 
       // 3) build your tables payload
       const tablesPayload = tables.map((tbl) => ({
-        table_number: (tbl.table_number),
+        table_number: tbl.table_number,
         capacity: Number(tbl.capacity),
         is_active: true,
       }));

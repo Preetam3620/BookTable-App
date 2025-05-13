@@ -217,7 +217,6 @@ async def get_all_restaurants(request: Request, db: Session = Depends(database.g
     return restaurants
 
 
-
 @router.delete("/admin/restaurants/{restaurant_id}", status_code=204)
 async def delete_restaurant_admin(
     restaurant_id: int, request: Request, db: Session = Depends(database.get_db)
@@ -238,7 +237,12 @@ async def delete_restaurant_admin(
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
-        # Delete related records first
+    # Delete tables
+    db.query(TableModel.Table).filter(
+        TableModel.Table.restaurant_id == restaurant_id
+    ).delete()
+    
+    # Delete operating hours
     db.query(OperatingHoursModel.OperatingHours).filter(
         OperatingHoursModel.OperatingHours.restaurant_id == restaurant_id
     ).delete()
