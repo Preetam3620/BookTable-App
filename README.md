@@ -1,48 +1,45 @@
-# FastAPI Backend 
+# Restaurant Booking App
 
-This is a FastAPI backend boilerplate project.
+> A full-stack reservation platform with role-based UX for Customers, Business Owners, and Admins.
 
-## Requirements
+## 📝 Project Overview
+A multi-role (Customer, BusinessOwner, Admin) booking system built with:
+- **Backend**: FastAPI + MySQL  
+- **Frontend**: ReactJS  
+- **Hosting**: AWS, GCP(For Database)  
 
-- Python 3.10+
-- MySQL database
+---
 
-## Installation
+## 🚀 Feature Set
+- **Customer**  
+  - Search restaurants by date/time/party size & location  
+  - View real-time availability slots  
+  - Book, view, cancel reservations  
+  - Submit and read reviews  
 
-- ### Clone the repository:
-```sh
-git clone <repository-url>
-cd <repository-directory>
-```
+- **Restaurant Manager**  
+  - CRUD restaurant listings (details, operating hours, photos)  
+  - Manage table configurations & capacities  
+  - View incoming bookings & analytics  
 
-- ### Create and activate a virtual environment:
-```sh
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
+- **Admin**  
+  - Approve/reject new listings  
+  - Monitor usage analytics  
+  - Manage users & listings  
+  - Ensure data integrity (duplicate checks, role-based auth)
 
-- ### Install the dependencies:
-```sh
-pip install -r requirements.txt
-```
+---
 
-- ### Set up the environment variables:
-    Create a .env file in the root directory and add the following:
-```sh
-DATABASE_URL=mysql+pymysql://root:xplorers@34.46.187.244:3306/bookTable
-```
+Diagrams are available in Project_Journal folder
 
-- ### Database Migration
-    Run the following command to create the database tables:
-```sh
-python migrate.py
-```
+---
 
-- ### Running the Application
-    Start the FastAPI application:
-```sh
-uvicorn app.main:app --reload
-```
+## 🧩 Design Decisions & Rationale
 
-- ### API Endpoints
-    The API endpoints are prefixed with `/api`. For example, to create a user, send a POST request to `http://127.0.0.1:8000/api/users/`.
+
+| Decision                                | Options Considered                                | Chosen                            |
+|-----------------------------------------|---------------------------------------------------|-----------------------------------|
+| **Backend Framework**                   | Flask, Django, FastAPI                            | FastAPI                           |
+| **Frontend Styling**                    | CSS Modules, Bootstrap                            | Cascading Style Sheets            |
+| ** Deployment**                         | GCP, AWS                                          | GCP, AWS                          |  
+| **Diagramming**                         | Figma, Mermaid, draw.io                           | Mermaid: markdown-native, Figma   |
